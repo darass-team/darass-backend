@@ -3,11 +3,15 @@ package com.darass.slack;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
+import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ActiveProfiles;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @SpringBootTest(classes = {
     SlackMessageSender.class
@@ -28,12 +32,15 @@ public class SlackMessageSenderTest {
     void slack() {
         given(slackMessageSender.getSlackChannelUri())
             .willReturn(PROD_ERROR_ALARM_SLACK_CHANNEL);
-        String response1 = slackMessageSender.send("Slack 전송 작동 여부 테스트용 메시지");
+        String response1 = Mono.fromCallable(() -> slackMessageSender.send("Slack 전송 작동 여부 테스트용 메시지"))
+            .block();
+
         assertThat(response1).isEqualTo(SUCCESS_RESPONSE);
 
         given(slackMessageSender.getSlackChannelUri())
             .willReturn(DEV_ERROR_ALARM_SLACK_CHANNEL);
-        String response2 = slackMessageSender.send("Slack 전송 작동 여부 테스트용 메시지");
+        String response2 = Mono.fromCallable(() -> slackMessageSender.send("Slack 전송 작동 여부 테스트용 메시지"))
+            .block();
         assertThat(response2).isEqualTo(SUCCESS_RESPONSE);
     }
 
