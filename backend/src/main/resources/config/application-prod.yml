@@ -1,0 +1,21 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  datasource:
+    hikari:
+      master:
+        jdbc-url: jdbc:mariadb://192.168.1.74:3306/darass-prod
+        username: root
+        password: prod
+      slave:
+        jdbc-url: jdbc:mariadb://192.168.1.83:3306/darass-prod
+        username: root
+        password: prod
+
+logging:
+  slack:
+    webhook-uri: /services/T0280M8QMGT/B02J0KQ1P6C/XHw8t5V6LibqoJ74DYxZGizv
+
+cookie:
+  same-site: None
