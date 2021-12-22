@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:mariadb://localhost:3306/darass-local
+    driver-class-name: org.mariadb.jdbc.Driver
+    username: darass
+    password: local
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+
+  h2:
+    console:
+      enabled: true
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    com.zaxxer.hikari.HikariConfig: DEBUG
+    com.zaxxer.hikari: TRACE
+  slack:
+    webhook-uri: none
+
+cookie:
+  same-site: None
