@@ -4,9 +4,7 @@ services:
     container_name: web-application-server
     build:
       context: .
-      dockerfile: Dockerfile-Migration
-    ports:
-      - "8080:8080"
+      dockerfile: Dockerfile
     volumes:
       - ../../logs:/var/log/application-logs
     network_mode: host
