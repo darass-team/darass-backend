@@ -4,8 +4,6 @@
 name: Dev-Darass Push Builder [BE]
 
 on:
-  pull_request:
-    breanches: [ main ]
   push:
     branches: [ main ]
 
