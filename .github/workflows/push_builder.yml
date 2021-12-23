@@ -4,8 +4,10 @@
 name: Darass Push Builder [BE]
 
 on:
+  pull_request:
+    branches: [ release ]
   push:
-    branches: [ main ]
+    branches: [ release ]
 
 jobs:
   deploy:
