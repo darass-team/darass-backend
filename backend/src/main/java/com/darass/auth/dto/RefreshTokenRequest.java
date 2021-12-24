@@ -1,5 +1,6 @@
 package com.darass.auth.dto;
 
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,8 +8,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccessTokenResponse {
+public class RefreshTokenRequest {
 
-    private String accessToken;
+    @NotNull
+    private String refreshToken;
 
 }

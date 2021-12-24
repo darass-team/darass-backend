@@ -11,12 +11,9 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.darass.MockSpringContainerTest;
-import com.darass.SpringContainerTest;
 import com.darass.auth.domain.KaKaoOAuthProvider;
-import com.darass.auth.domain.OAuthProviderFactory;
 import com.darass.auth.dto.AccessTokenResponse;
 import com.darass.auth.dto.TokenRequest;
-import com.darass.auth.infrastructure.JwtTokenProvider;
 import com.darass.exception.ExceptionWithMessageAndCode;
 import com.darass.exception.dto.ExceptionResponse;
 import com.darass.user.domain.SocialLoginUser;
@@ -29,8 +26,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
