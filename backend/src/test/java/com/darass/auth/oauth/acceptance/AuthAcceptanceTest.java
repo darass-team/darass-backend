@@ -12,8 +12,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.darass.MockSpringContainerTest;
 import com.darass.auth.domain.KaKaoOAuthProvider;
-import com.darass.auth.dto.AccessTokenResponse;
+import com.darass.auth.dto.RefreshTokenRequest;
 import com.darass.auth.dto.TokenRequest;
+import com.darass.auth.dto.TokenResponse;
 import com.darass.exception.ExceptionWithMessageAndCode;
 import com.darass.exception.dto.ExceptionResponse;
 import com.darass.user.domain.SocialLoginUser;
@@ -21,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import javax.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -82,7 +82,7 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
         토큰_발급_실패됨(resultActions);
     }
 
-    @DisplayName("쿠키에 들어있는 refresh 토큰을 통해 accessToken과 refresh 토큰을 재발급 받는다.")
+    @DisplayName("refresh 토큰을 통해 accessToken과 refresh 토큰을 재발급 받는다.")
     @Test
     void refreshToken() throws Exception {
         //given
@@ -93,62 +93,57 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
         토큰_발급됨(tokenRequestResultActions);
 
         String jsonResponse = tokenRequestResultActions.andReturn().getResponse().getContentAsString();
-        AccessTokenResponse accessTokenResponse = new ObjectMapper().readValue(jsonResponse, AccessTokenResponse.class);
-        String accessToken = accessTokenResponse.getAccessToken();
 
-        Cookie cookie = tokenRequestResultActions.andReturn().getResponse().getCookie("refreshToken");
-        String refreshToken = cookie.getValue();
+        TokenResponse tokenResponse = new ObjectMapper().readValue(jsonResponse, TokenResponse.class);
+        String accessToken = tokenResponse.getAccessToken();
+        String refreshToken = tokenResponse.getRefreshToken();
 
         // when
         Thread.sleep(1000);
 
-        ResultActions tokenRefreshResultActions = 토큰_리프레시_요청(cookie);
+        ResultActions tokenRefreshResultActions = 토큰_리프레시_요청(new RefreshTokenRequest(refreshToken));
 
         엑세스_토큰과_리프레쉬_토큰_재발급됨(accessToken, refreshToken, tokenRefreshResultActions);
     }
 
-    @DisplayName("쿠키에 refresh 토큰이 들어있지 않다면, accessToken과 refresh 토큰을 재발급을 실패한다.")
+    @DisplayName("refresh 토큰이 비어있다면, accessToken과 refresh 토큰을 재발급을 실패한다.")
     @Test
     void refreshToken_not_exists_refresh_token_fail() throws Exception {
         //given
         given(oAuthProviderFactory.getOAuthProvider(any())).willReturn(kaKaoOAuthProvider);
         given(kaKaoOAuthProvider.requestSocialLoginUser(any())).willReturn(socialLoginUser);
 
-        Cookie cookie = new Cookie("name", "value");
-
         // when
         Thread.sleep(1000);
 
-        ResultActions tokenRefreshResultActions = 토큰_리프레시_요청(cookie);
+        ResultActions tokenRefreshResultActions = 토큰_리프레시_요청(new RefreshTokenRequest(null));
 
-        유효하지_않은_리프레쉬_토큰으로_인해_엑세스_토큰과_리프레쉬_토큰_재발급_실패됨(tokenRefreshResultActions);
+        리프레시_토큰이_존재_하지않아_엑세스_토큰과_리프레쉬_토큰_재발급_실패됨(tokenRefreshResultActions);
     }
 
-    @DisplayName("쿠키를 보내지 않는다면, 404를 응답한다.")
+    @DisplayName("refresh 요청 객체가 비어있다면, 500을 응답한다.")
     @Test
-    void refreshToken_not_exists_cookie_fail() throws Exception {
+    void refreshTokenRequest_not_exists_fail() throws Exception {
         //given
         given(oAuthProviderFactory.getOAuthProvider(any())).willReturn(kaKaoOAuthProvider);
         given(kaKaoOAuthProvider.requestSocialLoginUser(any())).willReturn(socialLoginUser);
 
         ResultActions tokenRefreshResultActions = 토큰_리프레시_요청(null);
 
-        쿠키가_존재_하지않아_엑세스_토큰과_리프레쉬_토큰_재발급_실패됨(tokenRefreshResultActions);
+        리프레시_토큰_요청_객체가_존재_하지않아_엑세스_토큰과_리프레쉬_토큰_재발급_실패됨(tokenRefreshResultActions);
     }
 
-    @DisplayName("쿠키에 유효하지 않는 refresh 않다면, accessToken과 refresh 토큰을 재발급을 실패한다.")
+    @DisplayName("유효하지 않는 refresh 토큰이라면, accessToken과 refresh 토큰을 재발급을 실패한다.")
     @Test
     void refreshToken_invalid_refresh_token_fail() throws Exception {
         //given
         given(oAuthProviderFactory.getOAuthProvider(any())).willReturn(kaKaoOAuthProvider);
         given(kaKaoOAuthProvider.requestSocialLoginUser(any())).willReturn(socialLoginUser);
 
-        Cookie cookie = new Cookie("refreshToken", "invalidRefreshToken");
-
         // when
         Thread.sleep(1000);
 
-        ResultActions tokenRefreshResultActions = 토큰_리프레시_요청(cookie);
+        ResultActions tokenRefreshResultActions = 토큰_리프레시_요청(new RefreshTokenRequest("invalidRefreshToken"));
 
         유효하지_않은_리프레쉬_토큰으로_인해_엑세스_토큰과_리프레쉬_토큰_재발급_실패됨(tokenRefreshResultActions);
     }
@@ -169,14 +164,14 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
         로그아웃_rest_doc_작성(logOutResultActions);
     }
 
-    private void 리프레시_토큰이_존재_하지않아_엑세스_토큰과_리프레쉬_토큰_재발급_실패됨(ResultActions tokenRefreshResultActions)
+    private void 리프레시_토큰_요청_객체가_존재_하지않아_엑세스_토큰과_리프레쉬_토큰_재발급_실패됨(ResultActions tokenRefreshResultActions)
         throws Exception {
         tokenRefreshResultActions.andExpect(status().is5xxServerError());
 
         토큰_인증_로그인_실패_rest_doc_작성(tokenRefreshResultActions);
     }
 
-    private void 쿠키가_존재_하지않아_엑세스_토큰과_리프레쉬_토큰_재발급_실패됨(ResultActions tokenRefreshResultActions)
+    private void 리프레시_토큰이_존재_하지않아_엑세스_토큰과_리프레쉬_토큰_재발급_실패됨(ResultActions tokenRefreshResultActions)
         throws Exception {
         tokenRefreshResultActions.andExpect(status().isBadRequest());
     }
@@ -188,13 +183,9 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
         토큰_인증_로그인_실패_rest_doc_작성(tokenRefreshResultActions);
     }
 
-    private ResultActions 토큰_리프레시_요청(Cookie cookie) throws Exception {
-        if (Objects.isNull(cookie)) {
-            return this.mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/login/refresh")
-                .contentType(MediaType.APPLICATION_JSON));
-        }
+    private ResultActions 토큰_리프레시_요청(RefreshTokenRequest refreshTokenRequest) throws Exception {
         return this.mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/login/refresh")
-            .cookie(cookie)
+            .content(new ObjectMapper().writeValueAsString(refreshTokenRequest))
             .contentType(MediaType.APPLICATION_JSON));
     }
 
@@ -202,11 +193,10 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
         throws Exception {
         tokenRefreshResultActions.andExpect(status().isOk());
         String jsonResponse = tokenRefreshResultActions.andReturn().getResponse().getContentAsString();
-        AccessTokenResponse accessTokenResponse = new ObjectMapper().readValue(jsonResponse, AccessTokenResponse.class);
-        String newAccessToken = accessTokenResponse.getAccessToken();
 
-        Cookie cookie = tokenRefreshResultActions.andReturn().getResponse().getCookie("refreshToken");
-        String newRefreshToken = cookie.getValue();
+        TokenResponse tokenResponse = new ObjectMapper().readValue(jsonResponse, TokenResponse.class);
+        String newAccessToken = tokenResponse.getAccessToken();
+        String newRefreshToken = tokenResponse.getRefreshToken();
 
         assertThat(accessToken).isNotEqualTo(newAccessToken);
         assertThat(refreshToken).isNotEqualTo(newRefreshToken);
@@ -233,11 +223,10 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
     private Map<String, String> 토큰_발급됨(ResultActions resultActions) throws Exception {
         resultActions.andExpect(status().isOk());
         String jsonResponse = resultActions.andReturn().getResponse().getContentAsString();
-        AccessTokenResponse accessTokenResponse = new ObjectMapper().readValue(jsonResponse, AccessTokenResponse.class);
-        String accessToken = accessTokenResponse.getAccessToken();
+        TokenResponse tokenResponse = new ObjectMapper().readValue(jsonResponse, TokenResponse.class);
 
-        Cookie cookie = resultActions.andReturn().getResponse().getCookie("refreshToken");
-        String refreshToken = cookie.getValue();
+        String accessToken = tokenResponse.getAccessToken();
+        String refreshToken = tokenResponse.getRefreshToken();
 
         assertThatCode(() -> jwtTokenProvider.validateRefreshToken(refreshToken)).doesNotThrowAnyException();
         assertThat(jwtTokenProvider.getAccessTokenPayload(accessToken)).isEqualTo(socialLoginUser.getId().toString());
@@ -257,7 +246,8 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
                     fieldWithPath("authorizationCode").description("oauth 제공자가 발급해준 인가 코드")
                 ),
                 responseFields(
-                    fieldWithPath("accessToken").type(JsonFieldType.STRING).description("서버에서 발급해준 엑세스 토큰")
+                    fieldWithPath("accessToken").type(JsonFieldType.STRING).description("서버에서 발급해준 엑세스 토큰"),
+                    fieldWithPath("refreshToken").type(JsonFieldType.STRING).description("서버에서 발급해준 리프레쉬 토큰")
                 )
             )
         );
@@ -289,8 +279,7 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
 
     private ResultActions 로그아웃_요청(Map<String, String> tokens) throws Exception {
         return this.mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/v1/log-out")
-            .header("Authorization", "Bearer " + tokens.get("accessToken"))
-            .header("Cookie", "refreshToken=" + tokens.get("refreshToken")));
+            .header("Authorization", "Bearer " + tokens.get("accessToken")));
     }
 
     private void 로그아웃_됨(ResultActions resultActions) throws Exception {

@@ -73,7 +73,6 @@ public class CommentControllerTest {
                         null, UserResponse.of(socialLoginUser), null));
 
         mockMvc.perform(get("/api/v1/comments/" + commentId + "/secret-comment")
-                        .header("Cookie", "refreshToken=refreshToken")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("guestUserId", String.valueOf(guestUser.getId()))
                         .param("guestUserPassword", guestUser.getPassword()))
@@ -92,7 +91,6 @@ public class CommentControllerTest {
                 .willThrow(UnauthorizedException.class);
 
         mockMvc.perform(get("/api/v1/comments/" + commentId + "/secret-comment")
-                        .header("Cookie", "refreshToken=refreshToken")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("guestUserId", String.valueOf(guestUser.getId()))
                         .param("guestUserPassword", "Invalid"))
@@ -112,7 +110,6 @@ public class CommentControllerTest {
 
         mockMvc.perform(get("/api/v1/comments/" + commentId + "/secret-comment")
                         .header("Authorization", "Bearer " + ACCESS_TOKEN)
-                        .header("Cookie", "refreshToken=refreshToken")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
     }
