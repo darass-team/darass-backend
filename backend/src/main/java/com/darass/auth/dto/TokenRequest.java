@@ -1,5 +1,6 @@
 package com.darass.auth.dto;
 
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,8 +10,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TokenRequest {
 
+    @NotNull
     private String oauthProviderName;
 
+    @NotNull
     private String authorizationCode;
 
 }

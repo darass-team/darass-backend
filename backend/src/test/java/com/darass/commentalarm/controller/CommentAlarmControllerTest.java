@@ -13,7 +13,6 @@ import static org.springframework.restdocs.request.RequestDocumentation.requestP
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.darass.MockSpringContainerTest;
-import com.darass.SpringContainerTest;
 import com.darass.auth.service.OAuthService;
 import com.darass.comment.domain.Comment;
 import com.darass.commentalarm.domain.CommentAlarm;
@@ -24,7 +23,6 @@ import com.darass.user.domain.SocialLoginUser;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -112,7 +110,6 @@ class CommentAlarmControllerTest extends MockSpringContainerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + ACCESS_TOKEN)
                 .param("startDate", "2000-01-01")
                 .param("endDate", "2030-12-31")
-                .cookie(new Cookie(REFRESH_TOKEN, "refreshToken"))
         );
 
         //then

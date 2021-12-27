@@ -55,7 +55,7 @@ import org.springframework.web.multipart.MultipartFile;
 //TODO: user 필드에 추가된 빨간점 알람. flyway 반영
 
 @DisplayName("User 인수테스트")
-class UserAcceptanceTest extends SpringContainerTest { //TODO: 로그이웃 기능 체크
+class UserAcceptanceTest extends SpringContainerTest { //TODO: 로그아웃 기능 체크
 
     private static final String API_URL = "/api/v1/users";
 
@@ -120,21 +120,6 @@ class UserAcceptanceTest extends SpringContainerTest { //TODO: 로그이웃 기�
 
         //then
         유저_토큰_인증_실패됨(resultActions);
-        유저_조회_실패_rest_doc_작성(resultActions);
-    }
-
-
-    @Test
-    @DisplayName("유효하지 않은 리프레쉬 토큰으로 인해 토큰으로 유저 조회를 실패한다.")
-    void findUser_success2() throws Exception {
-        //given
-        String accessToken = tokenProvider.createAccessToken(socialLoginUser);
-
-        //when
-        ResultActions resultActions = 유저_조회_요청(accessToken, "invalidRefreshToken");
-
-        //then
-        유효하지_않은_리프레쉬_토큰으로_인해_유저_토큰_인증_실패됨(resultActions);
         유저_조회_실패_rest_doc_작성(resultActions);
     }
 
@@ -340,8 +325,7 @@ class UserAcceptanceTest extends SpringContainerTest { //TODO: 로그이웃 기�
     private ResultActions 유저_조회_요청(String accessToken, String refreshToken) throws Exception {
         return this.mockMvc.perform(get(API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .header("Authorization", "Bearer " + accessToken)
-            .header("Cookie", "refreshToken=" + refreshToken));
+            .header("Authorization", "Bearer " + accessToken));
     }
 
     private void 유저_조회됨(ResultActions resultActions) throws Exception {
@@ -388,7 +372,6 @@ class UserAcceptanceTest extends SpringContainerTest { //TODO: 로그이웃 기�
         return this.mockMvc.perform(patch(API_URL)
             .contentType(MediaType.MULTIPART_FORM_DATA)
             .header("Authorization", "Bearer " + accessToken)
-            .header("Cookie", "refreshToken=refreshToken")
             .param("nickName", userUpdateRequest.getNickName())
             .param("hasRecentAlarm", "true")
             .content(asJsonString(userUpdateRequest)));
@@ -405,8 +388,7 @@ class UserAcceptanceTest extends SpringContainerTest { //TODO: 로그이웃 기�
             .file((MockMultipartFile) userUpdateRequest.getProfileImageFile())
             .param("nickName", userUpdateRequest.getNickName())
             .param("hasRecentAlarm", "true")
-            .header("Authorization", "Bearer " + accessToken)
-            .header("Cookie", "refreshToken=refreshToken"));
+            .header("Authorization", "Bearer " + accessToken));
     }
 
     private void 유저_닉네임_수정됨(ResultActions resultActions, UserUpdateRequest userUpdateRequest) throws Exception {
@@ -497,8 +479,7 @@ class UserAcceptanceTest extends SpringContainerTest { //TODO: 로그이웃 기�
     private ResultActions 유저_삭제_요청(String accessToken) throws Exception {
         return this.mockMvc.perform(delete(API_URL)
             .contentType(MediaType.APPLICATION_JSON)
-            .header("Authorization", "Bearer " + accessToken)
-            .header("Cookie", "refreshToken=refreshToken"));
+            .header("Authorization", "Bearer " + accessToken));
     }
 
     private void 유저_정보_삭제됨(ResultActions resultActions) throws Exception {
