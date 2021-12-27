@@ -6,5 +6,5 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ../../logs:/var/log/application-logs
+      - ../../../logs:/var/log/application-logs
     network_mode: host
