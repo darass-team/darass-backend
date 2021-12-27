@@ -5,10 +5,10 @@ name: Darass Push Builder [BE]
 
 on:
   push:
-    branches: [ main ]
+    branches: [ release ]
 
 jobs:
-  deploy:
+  prod-deploy:
 
     runs-on: ubuntu-latest
 

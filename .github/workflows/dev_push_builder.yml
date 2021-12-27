@@ -1,14 +1,14 @@
 # This workflow will build a Java project with Gradle
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
 
-name: Darass PR Checker [BE]
+name: Dev-Darass Push Builder [BE]
 
 on:
-  pull_request:
+  push:
     branches: [ main ]
 
 jobs:
-  build:
+  dev-deploy:
 
     runs-on: ubuntu-latest
 
@@ -37,7 +37,39 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew clean build
       working-directory: ./backend
+      
+    - name: Copy built project
+      if: success()
+      uses: appleboy/scp-action@master
+      env:
+        GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
+        GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
+      with:
+        host: ${{ secrets.NCP_ACCESS_HOST }}
+        username: ${{ secrets.NCP_USERNAME }}
+        port: ${{ secrets.NCP_PORT }}
+        password: ${{ secrets.NCP_PASSWORD }}
+        envs: GIT_USERNAME, GIT_PASSWORD
+        source: '.'
+        target: '/root/application/darass-backend'
+        strip_components: 1
 
+    - name: AWS EC2에 ssh로 접속해서 scripts 실행시키기
+      if: success()
+      uses: appleboy/ssh-action@master
+      env:
+        GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
+        GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
+      with:
+        host: ${{ secrets.NCP_ACCESS_HOST }}
+        username: ${{ secrets.NCP_USERNAME }}
+        port: ${{ secrets.NCP_PORT }}
+        password: ${{ secrets.NCP_PASSWORD }}
+        envs: GIT_USERNAME, GIT_PASSWORD
+        script: |
+          cd /root/application/darass-backend/backend/dev
+          docker-compose up --build -d
+          
     - name: build result to slack
       uses: 8398a7/action-slack@v3
       with:
