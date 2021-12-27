@@ -66,13 +66,6 @@ public class SocialLoginUser extends User {
         refreshToken = null;
     }
 
-    public boolean isValidateRefreshToken(String refreshToken) {
-        if (this.refreshToken == null) {
-            return false;
-        }
-        return this.refreshToken.equals(refreshToken);
-    }
-
     public void updateEmail(String email) {
         this.email = email;
     }
