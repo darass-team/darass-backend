@@ -67,8 +67,8 @@ jobs:
         password: ${{ secrets.NCP_PASSWORD }}
         envs: GIT_USERNAME, GIT_PASSWORD
         script: |
-          cd /root/application/darass-backend/backend/dev
-          docker-compose up --build -d
+          cd /root/application/darass-backend/backend
+          docker-compose up --build -d develop-application-server
           
     - name: build result to slack
       uses: 8398a7/action-slack@v3

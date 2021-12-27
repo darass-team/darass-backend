@@ -66,7 +66,7 @@ jobs:
         envs: GIT_USERNAME, GIT_PASSWORD
         script: |
           cd /home/ubuntu/application/darass-backend/backend
-          docker-compose up --build -d
+          docker-compose up --build -d prod-application-server
           
     - name: build result to slack
       uses: 8398a7/action-slack@v3
