@@ -51,7 +51,7 @@ jobs:
         password: ${{ secrets.NCP_PASSWORD }}
         envs: GIT_USERNAME, GIT_PASSWORD
         source: '.'
-        target: '/home/ubuntu/application/darass-backend'
+        target: '/root/application/darass-backend'
         strip_components: 1
 
     - name: AWS EC2에 ssh로 접속해서 scripts 실행시키기
@@ -67,7 +67,7 @@ jobs:
         password: ${{ secrets.NCP_PASSWORD }}
         envs: GIT_USERNAME, GIT_PASSWORD
         script: |
-          cd /home/ubuntu/application/darass-backend/backend/dev
+          cd /root/application/darass-backend/backend/dev
           docker-compose up --build -d
           
     - name: build result to slack
