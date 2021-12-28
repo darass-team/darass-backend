@@ -374,8 +374,8 @@ include::{snippets}/api/v1/comments/patch/fail-not-mine/response-fields.adoc[]
 
 ==== Response
 
-include::{snippets}/api/v1/comments/patch/fail-guest-password-wrong/http-response.adoc[]
-include::{snippets}/api/v1/comments/patch/fail-guest-password-wrong/response-fields.adoc[]
+include::{snippets}/api/v1/comments/secret-comment/guest-user/get/fail-not-mine/http-response.adoc[]
+include::{snippets}/api/v1/comments/secret-comment/guest-user/get/fail-not-mine/response-fields.adoc[]
 
 === 댓글 삭제 (DELETE /api/v1/comments)
 
