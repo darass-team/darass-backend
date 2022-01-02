@@ -7,21 +7,17 @@ import static org.mockito.BDDMockito.given;
 
 import com.darass.MockSpringContainerTest;
 import com.darass.auth.domain.KaKaoOAuthProvider;
-import com.darass.auth.domain.OAuthProviderFactory;
+import com.darass.auth.dto.AccessTokenResponse;
 import com.darass.auth.dto.TokenRequest;
 import com.darass.auth.dto.TokenResponse;
 import com.darass.auth.infrastructure.JwtTokenProvider;
-import com.darass.SpringContainerTest;
 import com.darass.exception.ExceptionWithMessageAndCode;
 import com.darass.user.domain.SocialLoginUser;
-import com.darass.user.repository.SocialLoginUserRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 
 @DisplayName("OAuthService 클래스")
 class OAuthServiceTest extends MockSpringContainerTest {
@@ -108,9 +104,9 @@ class OAuthServiceTest extends MockSpringContainerTest {
         assertThat(result.getEmail()).isEqualTo(socialLoginUser.getEmail());
     }
 
-    @DisplayName("refreshAccessTokenWithRefreshToken 메서드는 유효한 refreshToken이 주어지면, 새로운 refreshToken과 accessToken을 발급해준다.")
+    @DisplayName("유효한 refreshToken이 주어지면, accessToken을 발급해준다.")
     @Test
-    void refreshAccessTokenWithRefreshToken() throws InterruptedException {
+    void getAccessTokenWithRefreshToken() throws InterruptedException {
         //given
         TokenRequest tokenRequest = new TokenRequest(KaKaoOAuthProvider.NAME, AUTHORIZATION_CODE);
         TokenResponse tokenResponse = oAuthService.oauthLogin(tokenRequest);
@@ -118,11 +114,10 @@ class OAuthServiceTest extends MockSpringContainerTest {
         Thread.sleep(1000);
 
         //when
-        TokenResponse refreshedTokenResponse = oAuthService.refreshAccessTokenWithRefreshToken(tokenResponse.getRefreshToken());
+        AccessTokenResponse accessTokenResponse = oAuthService.getAccessTokenWithRefreshToken(tokenResponse.getRefreshToken());
 
         //then
-        assertThat(tokenResponse.getAccessToken()).isNotEqualTo(refreshedTokenResponse.getAccessToken());
-        assertThat(tokenResponse.getRefreshToken()).isNotEqualTo(refreshedTokenResponse.getRefreshToken());
+        assertThat(tokenResponse.getAccessToken()).isNotEqualTo(accessTokenResponse.getAccessToken());
     }
 
     @DisplayName("refreshAccessTokenWithRefreshToken 메서드는 refreshToken이 db에 존재하지 않는다면, 예외를 던진다.")
@@ -132,7 +127,7 @@ class OAuthServiceTest extends MockSpringContainerTest {
         TokenResponse tokenResponse = oAuthService.oauthLogin(tokenRequest);
         socialLoginUserRepository.deleteAll();
 
-        assertThatThrownBy(() -> oAuthService.refreshAccessTokenWithRefreshToken(tokenResponse.getRefreshToken()))
+        assertThatThrownBy(() -> oAuthService.getAccessTokenWithRefreshToken(tokenResponse.getRefreshToken()))
             .isInstanceOf(ExceptionWithMessageAndCode.SHOULD_LOGIN.getException().getClass());
     }
 

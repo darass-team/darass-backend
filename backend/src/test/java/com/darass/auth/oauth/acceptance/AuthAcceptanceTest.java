@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.darass.MockSpringContainerTest;
 import com.darass.auth.domain.KaKaoOAuthProvider;
+import com.darass.auth.dto.AccessTokenResponse;
 import com.darass.auth.dto.RefreshTokenRequest;
 import com.darass.auth.dto.TokenRequest;
 import com.darass.auth.dto.TokenResponse;
@@ -21,7 +22,6 @@ import com.darass.user.domain.SocialLoginUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -82,7 +82,7 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
         토큰_발급_실패됨(resultActions);
     }
 
-    @DisplayName("refresh 토큰을 통해 accessToken과 refresh 토큰을 재발급 받는다.")
+    @DisplayName("refresh 토큰을 통해 accessToken을 재발급 받는다.")
     @Test
     void refreshToken() throws Exception {
         //given
@@ -103,10 +103,10 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
 
         ResultActions tokenRefreshResultActions = 토큰_리프레시_요청(new RefreshTokenRequest(refreshToken));
 
-        엑세스_토큰과_리프레쉬_토큰_재발급됨(accessToken, refreshToken, tokenRefreshResultActions);
+        엑세스_토큰_재발급됨(accessToken, tokenRefreshResultActions);
     }
 
-    @DisplayName("refresh 토큰이 비어있다면, accessToken과 refresh 토큰을 재발급을 실패한다.")
+    @DisplayName("refresh 토큰이 비어있다면, accessToken 재발급을 실패한다.")
     @Test
     void refreshToken_not_exists_refresh_token_fail() throws Exception {
         //given
@@ -118,7 +118,7 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
 
         ResultActions tokenRefreshResultActions = 토큰_리프레시_요청(new RefreshTokenRequest(null));
 
-        리프레시_토큰이_존재_하지않아_엑세스_토큰과_리프레쉬_토큰_재발급_실패됨(tokenRefreshResultActions);
+        리프레시_토큰이_존재_하지않아_엑세스_토큰_재발급_실패됨(tokenRefreshResultActions);
     }
 
     @DisplayName("refresh 요청 객체가 비어있다면, 500을 응답한다.")
@@ -130,10 +130,10 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
 
         ResultActions tokenRefreshResultActions = 토큰_리프레시_요청(null);
 
-        리프레시_토큰_요청_객체가_존재_하지않아_엑세스_토큰과_리프레쉬_토큰_재발급_실패됨(tokenRefreshResultActions);
+        리프레시_토큰_요청_객체가_존재_하지않아_엑세스_토큰_재발급_실패됨(tokenRefreshResultActions);
     }
 
-    @DisplayName("유효하지 않는 refresh 토큰이라면, accessToken과 refresh 토큰을 재발급을 실패한다.")
+    @DisplayName("유효하지 않는 refresh 토큰이라면, accessToken을 재발급을 실패한다.")
     @Test
     void refreshToken_invalid_refresh_token_fail() throws Exception {
         //given
@@ -145,7 +145,7 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
 
         ResultActions tokenRefreshResultActions = 토큰_리프레시_요청(new RefreshTokenRequest("invalidRefreshToken"));
 
-        유효하지_않은_리프레쉬_토큰으로_인해_엑세스_토큰과_리프레쉬_토큰_재발급_실패됨(tokenRefreshResultActions);
+        유효하지_않은_리프레쉬_토큰으로_인해_엑세스_토큰_재발급_실패됨(tokenRefreshResultActions);
     }
 
     @DisplayName("엑세스 토큰을 보내서 로그아웃을 진행한다.")
@@ -164,19 +164,19 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
         로그아웃_rest_doc_작성(logOutResultActions);
     }
 
-    private void 리프레시_토큰_요청_객체가_존재_하지않아_엑세스_토큰과_리프레쉬_토큰_재발급_실패됨(ResultActions tokenRefreshResultActions)
+    private void 리프레시_토큰_요청_객체가_존재_하지않아_엑세스_토큰_재발급_실패됨(ResultActions tokenRefreshResultActions)
         throws Exception {
         tokenRefreshResultActions.andExpect(status().is5xxServerError());
 
         토큰_인증_로그인_실패_rest_doc_작성(tokenRefreshResultActions);
     }
 
-    private void 리프레시_토큰이_존재_하지않아_엑세스_토큰과_리프레쉬_토큰_재발급_실패됨(ResultActions tokenRefreshResultActions)
+    private void 리프레시_토큰이_존재_하지않아_엑세스_토큰_재발급_실패됨(ResultActions tokenRefreshResultActions)
         throws Exception {
         tokenRefreshResultActions.andExpect(status().isBadRequest());
     }
 
-    private void 유효하지_않은_리프레쉬_토큰으로_인해_엑세스_토큰과_리프레쉬_토큰_재발급_실패됨(ResultActions tokenRefreshResultActions)
+    private void 유효하지_않은_리프레쉬_토큰으로_인해_엑세스_토큰_재발급_실패됨(ResultActions tokenRefreshResultActions)
         throws Exception {
         tokenRefreshResultActions.andExpect(status().is4xxClientError());
 
@@ -189,22 +189,20 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
             .contentType(MediaType.APPLICATION_JSON));
     }
 
-    private void 엑세스_토큰과_리프레쉬_토큰_재발급됨(String accessToken, String refreshToken, ResultActions tokenRefreshResultActions)
+    private void 엑세스_토큰_재발급됨(String accessToken, ResultActions tokenRefreshResultActions)
         throws Exception {
         tokenRefreshResultActions.andExpect(status().isOk());
         String jsonResponse = tokenRefreshResultActions.andReturn().getResponse().getContentAsString();
 
-        TokenResponse tokenResponse = new ObjectMapper().readValue(jsonResponse, TokenResponse.class);
-        String newAccessToken = tokenResponse.getAccessToken();
-        String newRefreshToken = tokenResponse.getRefreshToken();
+        AccessTokenResponse accessTokenResponse = new ObjectMapper().readValue(jsonResponse, AccessTokenResponse.class);
+        String newAccessToken = accessTokenResponse.getAccessToken();
 
         assertThat(accessToken).isNotEqualTo(newAccessToken);
-        assertThat(refreshToken).isNotEqualTo(newRefreshToken);
 
-        엑세스_토큰과_리프레쉬_토큰_재발급됨_rest_doc_작성(tokenRefreshResultActions);
+        엑세스_토큰_재발급됨_rest_doc_작성(tokenRefreshResultActions);
     }
 
-    private void 엑세스_토큰과_리프레쉬_토큰_재발급됨_rest_doc_작성(ResultActions resultActions) throws Exception {
+    private void 엑세스_토큰_재발급됨_rest_doc_작성(ResultActions resultActions) throws Exception {
         resultActions.andDo(
             document("api/v1/login-refresh/post/success",
                 responseFields(
