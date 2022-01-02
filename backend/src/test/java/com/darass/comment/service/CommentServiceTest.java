@@ -358,7 +358,7 @@ class CommentServiceTest extends SpringContainerTest {
     @Test
     void stat_hourly() {
         LocalDate endDate = LocalDate.now();
-        LocalDate startDate = LocalDate.of(endDate.getYear(), endDate.getMonthValue() - 1, endDate.getDayOfMonth());
+        LocalDate startDate = endDate.minusMonths(1L);
         CommentStatRequest request = new CommentStatRequest("HOURLY", project.getSecretKey(),
             startDate, endDate);
         CommentStatResponse commentStatResponse = commentService.giveStat(request);
@@ -369,7 +369,7 @@ class CommentServiceTest extends SpringContainerTest {
     @Test
     void stat_daily() {
         LocalDate endDate = LocalDate.now();
-        LocalDate startDate = LocalDate.of(endDate.getYear(), endDate.getMonthValue() - 1, endDate.getDayOfMonth());
+        LocalDate startDate = endDate.minusMonths(1L);
         CommentStatRequest request = new CommentStatRequest("DAILY", project.getSecretKey(),
             startDate, endDate);
         CommentStatResponse commentStatResponse = commentService.giveStat(request);
@@ -392,7 +392,7 @@ class CommentServiceTest extends SpringContainerTest {
     @Test
     void stat_monthly() {
         LocalDate endDate = LocalDate.now();
-        LocalDate startDate = LocalDate.of(endDate.getYear(), endDate.getMonthValue() - 4, 1);
+        LocalDate startDate = endDate.minusMonths(4L).minusDays(1L);
         CommentStatRequest request = new CommentStatRequest("MONTHLY", project.getSecretKey(),
             startDate, endDate);
         CommentStatResponse commentStatResponse = commentService.giveStat(request);

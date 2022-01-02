@@ -10,6 +10,7 @@ import com.darass.commentalarm.repository.CommentAlarmRepository;
 import com.darass.SpringContainerTest;
 import com.darass.user.domain.SocialLoginUser;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -78,7 +79,7 @@ class CommentAlarmServiceTest extends SpringContainerTest {
         List<CommentAlarmResponse> commentAlarmResponses = commentAlarmService.findAllCreatedDateBetween(
             RECEIVER,
             LocalDate.of(2020, 1, 1).atTime(LocalTime.MIN),
-            LocalDate.of(2022, 1, 1).atTime(LocalTime.MAX)
+            LocalDate.of(LocalDateTime.now().getYear() + 1, 1, 1).atTime(LocalTime.MAX)
         );
 
         assertThat(commentAlarmResponses).hasSize(3);
