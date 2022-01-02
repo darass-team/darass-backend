@@ -2,6 +2,7 @@ package com.darass.auth.service;
 
 import com.darass.auth.domain.OAuthProvider;
 import com.darass.auth.domain.OAuthProviderFactory;
+import com.darass.auth.dto.AccessTokenResponse;
 import com.darass.auth.dto.TokenRequest;
 import com.darass.auth.dto.TokenResponse;
 import com.darass.auth.infrastructure.JwtTokenProvider;
@@ -47,7 +48,7 @@ public class OAuthService {
             .orElseThrow(ExceptionWithMessageAndCode.INVALID_JWT_NOT_FOUND_USER_TOKEN::getException);
     }
 
-    public TokenResponse refreshAccessTokenWithRefreshToken(String refreshToken) {
+    public AccessTokenResponse getAccessTokenWithRefreshToken(String refreshToken) {
         jwtTokenProvider.validateRefreshToken(refreshToken);
 
         SocialLoginUser socialLoginUser = socialLoginUserRepository.findByRefreshToken(refreshToken)
@@ -55,8 +56,7 @@ public class OAuthService {
                 throw ExceptionWithMessageAndCode.INVALID_REFRESH_TOKEN.getException();
             });
 
-        return TokenResponse.of(jwtTokenProvider.createAccessToken(socialLoginUser),
-            jwtTokenProvider.createRefreshToken(socialLoginUser));
+        return new AccessTokenResponse(jwtTokenProvider.createAccessToken(socialLoginUser));
     }
 
     public void logOut(SocialLoginUser socialLoginUser) {

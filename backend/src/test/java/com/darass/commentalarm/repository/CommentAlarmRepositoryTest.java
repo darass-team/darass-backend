@@ -80,7 +80,7 @@ class CommentAlarmRepositoryTest extends SpringContainerTest {
         List<CommentAlarm> commentAlarms = commentAlarmRepository.findAllByReceiverAndCreatedDateBetweenOrderByCreatedDateDesc(
             receiver,
             LocalDateTime.of(2020, 1, 1, 1, 1),
-            LocalDateTime.of(2022, 1, 1, 1, 1)
+            LocalDateTime.of(LocalDateTime.now().getYear() + 1, 1, 1, 1, 1)
         );
 
         assertThat(commentAlarms.size()).isEqualTo(2);

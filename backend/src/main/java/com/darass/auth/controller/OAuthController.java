@@ -30,9 +30,9 @@ public class OAuthController {
     }
 
     @PostMapping("/login/refresh")
-    public ResponseEntity<AccessTokenResponse> refreshToken(@RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
-        TokenResponse tokenResponse = oAuthService.refreshAccessTokenWithRefreshToken(refreshTokenRequest.getRefreshToken());
-        return ResponseEntity.status(HttpStatus.OK).body(new AccessTokenResponse(tokenResponse.getAccessToken()));
+    public ResponseEntity<AccessTokenResponse> regenerateAccessToken(@RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(oAuthService.getAccessTokenWithRefreshToken(refreshTokenRequest.getRefreshToken()));
     }
 
     @DeleteMapping("/log-out")
