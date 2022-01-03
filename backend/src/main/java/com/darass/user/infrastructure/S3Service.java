@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +17,6 @@ import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
 import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
@@ -23,8 +24,15 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 @RequiredArgsConstructor
 public class S3Service {
 
+    private static final String FILE_NAME_FORMAT = "%s-%s-%s";
+
+    private static final DateTimeFormatter NOW_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
+
+    @Value("${name}")
+    private String profileName;
 
     private final S3Client s3Client;
 
@@ -58,7 +66,8 @@ public class S3Service {
     }
 
     private String uploadToS3(File uploadFile) {
-        String fileName = new Date().getTime() + uploadFile.getName();
+        String now = LocalDateTime.now().format(NOW_FORMATTER);
+        String fileName = String.format(FILE_NAME_FORMAT, profileName, now, uploadFile.getName());
         PutObjectRequest objectRequest = PutObjectRequest.builder()
             .bucket(bucket)
             .key(fileName)
