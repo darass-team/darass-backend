@@ -47,13 +47,14 @@ public class SocialLoginUser extends User {
         throw ExceptionWithMessageAndCode.NOT_GUEST_USER.getException();
     }
 
-    public void changeNickNameOrProfileImageIfExists(S3Service s3Service, String nickName,
-        MultipartFile profileImageFile) {
+    public void changeNickNameOrProfileImageIfExists(S3Service s3Service, String nickName, MultipartFile profileImageFile) {
         if (!Objects.isNull(nickName)) {
             changeNickName(nickName);
         }
         if (!Objects.isNull(profileImageFile)) {
-            s3Service.delete(getProfileImageUrl());
+            if (!getProfileImageUrl().isBlank()) {
+                s3Service.delete(getProfileImageUrl());
+            }
             String imageUrl = s3Service.upload(profileImageFile);
             changeProfileImageUrl(imageUrl);
         }

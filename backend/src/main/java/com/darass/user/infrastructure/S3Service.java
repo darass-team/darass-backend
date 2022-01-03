@@ -33,20 +33,18 @@ public class S3Service {
         return uploadToS3(uploadFile);
     }
 
-    public DeleteObjectResponse delete(String profileImageUrl) {
+    public void delete(String profileImageUrl) {
         DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
             .bucket(bucket)
             .key(extractKey(profileImageUrl))
             .build();
-        return s3Client.deleteObject(deleteObjectRequest);
+        s3Client.deleteObject(deleteObjectRequest);
     }
 
     private String extractKey(String profileImageUrl) {
-        if (!profileImageUrl.contains("/")) {
-            return "";
-        }
         String[] split = profileImageUrl.split("/");
-        return URLDecoder.decode(split[split.length - 1], StandardCharsets.UTF_8);
+        int positionOfKey = split.length - 1;
+        return URLDecoder.decode(split[positionOfKey], StandardCharsets.UTF_8);
     }
 
     private File convert(MultipartFile multipartFile) {
