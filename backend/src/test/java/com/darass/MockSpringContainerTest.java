@@ -6,7 +6,7 @@ import com.darass.auth.infrastructure.JwtTokenProvider;
 import com.darass.auth.service.OAuthService;
 import com.darass.commentalarm.domain.CommentAlarmMachine;
 import com.darass.commentalarm.service.CommentAlarmService;
-import com.darass.user.infrastructure.S3Uploader;
+import com.darass.user.infrastructure.S3Service;
 import com.darass.user.repository.SocialLoginUserRepository;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -36,7 +36,7 @@ public class MockSpringContainerTest extends SpringContainerTest {
     protected OAuthService oAuthService;
 
     @SpyBean
-    protected S3Uploader s3Uploader;
+    protected S3Service s3Service;
 
     @MockBean
     protected S3Client s3Client;

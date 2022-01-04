@@ -7,7 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.darass.exception.ExceptionWithMessageAndCode;
-import com.darass.user.infrastructure.S3Uploader;
+import com.darass.user.infrastructure.S3Service;
 import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -84,17 +84,17 @@ class SocialLoginUserTest {
         String initName = "첫이름";
         String initProfileImageUrl = "첫이미지url주소";
         String changedProfileImageUrl = "변경된이미지url주소";
-        S3Uploader s3Uploader = mock(S3Uploader.class);
+        S3Service s3Service = mock(S3Service.class);
         MultipartFile multipartFile = mock(MultipartFile.class);
 
-        when(s3Uploader.upload(any())).thenReturn(changedProfileImageUrl);
+        when(s3Service.upload(any())).thenReturn(changedProfileImageUrl);
         SocialLoginUser user = SocialLoginUser.builder()
             .nickName(initName)
             .profileImageUrl(initProfileImageUrl)
             .build();
 
         // when
-        user.changeNickNameOrProfileImageIfExists(s3Uploader, null, multipartFile);
+        user.changeNickNameOrProfileImageIfExists(s3Service, null, multipartFile);
 
         // then
         assertThat(user.getProfileImageUrl()).isEqualTo(changedProfileImageUrl);

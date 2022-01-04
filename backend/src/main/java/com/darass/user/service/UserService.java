@@ -7,7 +7,7 @@ import com.darass.user.dto.PasswordCheckRequest;
 import com.darass.user.dto.PasswordCheckResponse;
 import com.darass.user.dto.UserResponse;
 import com.darass.user.dto.UserUpdateRequest;
-import com.darass.user.infrastructure.S3Uploader;
+import com.darass.user.infrastructure.S3Service;
 import com.darass.user.repository.UserRepository;
 import java.util.Objects;
 import java.util.Optional;
@@ -23,7 +23,7 @@ public class UserService {
 
     private static final int MAX_FILE_SIZE = 5000000; // 5MB
     private final UserRepository userRepository;
-    private final S3Uploader s3Uploader;
+    private final S3Service s3Service;
 
     @Transactional(readOnly = true)
     public UserResponse findById(Long id) {
@@ -41,7 +41,7 @@ public class UserService {
         if (!Objects.isNull(profileImageFile) && profileImageFile.getSize() >= MAX_FILE_SIZE) {
             throw ExceptionWithMessageAndCode.OVER_MAX_FILE_SIZE.getException();
         }
-        user.changeNickNameOrProfileImageIfExists(s3Uploader, nickName, profileImageFile);
+        user.changeNickNameOrProfileImageIfExists(s3Service, nickName, profileImageFile);
         if (!Objects.isNull(userUpdateRequest.getHasRecentAlarm())) {
             user.changeHasRecentAlarm(userUpdateRequest.getHasRecentAlarm());
         }

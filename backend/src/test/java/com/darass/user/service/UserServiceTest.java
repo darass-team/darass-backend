@@ -15,6 +15,7 @@ import com.darass.user.domain.SocialLoginUser;
 import com.darass.user.domain.User;
 import com.darass.user.dto.UserResponse;
 import com.darass.user.dto.UserUpdateRequest;
+import com.darass.user.infrastructure.S3Service;
 import com.darass.user.repository.UserRepository;
 import javax.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
@@ -22,18 +23,23 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 @DisplayName("UserService 클래스")
 class UserServiceTest extends SpringContainerTest {
 
     @Autowired
-    ProjectRepository projectRepository;
+    private ProjectRepository projectRepository;
+
     @Autowired
-    CommentRepository commentRepository;
+    private CommentRepository commentRepository;
+
     @Autowired
     private UserService userService;
+
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private CommentLikeRepository commentLikeRepository;
 

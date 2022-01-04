@@ -34,7 +34,7 @@ import com.darass.user.domain.SocialLoginUser;
 import com.darass.user.dto.PasswordCheckResponse;
 import com.darass.user.dto.UserResponse;
 import com.darass.user.dto.UserUpdateRequest;
-import com.darass.user.infrastructure.S3Uploader;
+import com.darass.user.infrastructure.S3Service;
 import com.darass.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.file.Files;
@@ -75,7 +75,7 @@ class UserAcceptanceTest extends SpringContainerTest { //TODO: 로그아웃 기�
     private String projectSecretKey;
 
     @MockBean
-    private S3Uploader s3Uploader;
+    private S3Service s3Service;
 
     @MockBean
     private CommentAlarmMachine commentAlarmMachine;
@@ -156,7 +156,7 @@ class UserAcceptanceTest extends SpringContainerTest { //TODO: 로그아웃 기�
         String originalFilename = "testImg.jpg";
         MultipartFile multipartFile = new MockMultipartFile("profileImageFile", originalFilename, "image/jpeg", bytes);
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest("우기", multipartFile, true);
-        given(s3Uploader.upload(any())).willReturn(originalFilename);
+        given(s3Service.upload(any())).willReturn(originalFilename);
 
         //when
         ResultActions resultActions = 유저_프로필_사진_수정_요청(userUpdateRequest, accessToken);
@@ -203,7 +203,7 @@ class UserAcceptanceTest extends SpringContainerTest { //TODO: 로그아웃 기�
         String originalFilename = "overSizeImage.jpg";
         MultipartFile multipartFile = new MockMultipartFile("profileImageFile", originalFilename, "image/jpeg", bytes);
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest(null, multipartFile, true);
-        given(s3Uploader.upload(any())).willReturn(originalFilename);
+        given(s3Service.upload(any())).willReturn(originalFilename);
 
         //when
         ResultActions resultActions = 유저_프로필_사진_수정_요청(userUpdateRequest, accessToken);

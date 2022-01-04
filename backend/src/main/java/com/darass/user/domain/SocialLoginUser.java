@@ -1,7 +1,7 @@
 package com.darass.user.domain;
 
 import com.darass.exception.ExceptionWithMessageAndCode;
-import com.darass.user.infrastructure.S3Uploader;
+import com.darass.user.infrastructure.S3Service;
 import java.util.Objects;
 import javax.persistence.Entity;
 import lombok.Builder;
@@ -47,13 +47,15 @@ public class SocialLoginUser extends User {
         throw ExceptionWithMessageAndCode.NOT_GUEST_USER.getException();
     }
 
-    public void changeNickNameOrProfileImageIfExists(S3Uploader s3Uploader, String nickName,
-        MultipartFile profileImageFile) {
+    public void changeNickNameOrProfileImageIfExists(S3Service s3Service, String nickName, MultipartFile profileImageFile) {
         if (!Objects.isNull(nickName)) {
             changeNickName(nickName);
         }
         if (!Objects.isNull(profileImageFile)) {
-            String imageUrl = s3Uploader.upload(profileImageFile);
+            if (!getProfileImageUrl().isBlank()) {
+                s3Service.delete(getProfileImageUrl());
+            }
+            String imageUrl = s3Service.upload(profileImageFile);
             changeProfileImageUrl(imageUrl);
         }
     }
