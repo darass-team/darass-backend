@@ -16,6 +16,8 @@ class JwtTokenProviderTest extends SpringContainerTest {
 
     private static final SocialLoginUser SOCIAL_LOGIN_USER;
 
+    private static final SocialLoginUser SOCIAL_LOGIN_USER2;
+
     static {
         SOCIAL_LOGIN_USER = SocialLoginUser
             .builder()
@@ -25,6 +27,17 @@ class JwtTokenProviderTest extends SpringContainerTest {
             .oauthProvider("kakao")
             .email("jujubebat@kakao.com")
             .profileImageUrl("http://kakao/profileImage.png")
+            .build();
+
+        SOCIAL_LOGIN_USER2 = SocialLoginUser
+            .builder()
+            .id(1L)
+            .nickName("박진영")
+            .oauthId("6752453")
+            .oauthProvider("kakao")
+            .email("jujubebat@kakao.com")
+            .profileImageUrl("http://kakao/profileImage.png")
+            .refreshToken("refreshToken")
             .build();
     }
 
@@ -47,6 +60,17 @@ class JwtTokenProviderTest extends SpringContainerTest {
         String refreshToken = jwtTokenProvider.createRefreshToken(SOCIAL_LOGIN_USER);
 
         assertThat(jwtTokenProvider.createRefreshToken(SOCIAL_LOGIN_USER)).isNotEmpty();
+        assertThatCode(() -> jwtTokenProvider.validateRefreshToken(refreshToken)).doesNotThrowAnyException();
+    }
+
+    @DisplayName("createRefreshToken 메서드는 socialLoginUser가 주어질 때, "
+        + "socialLoginUser의 refreshToken이 이미 유효하다면 그 토큰을 리턴한다.")
+    @Test
+    void createRefreshToken_exist_refreshToken() {
+        String refreshToken = jwtTokenProvider.createRefreshToken(SOCIAL_LOGIN_USER2);
+
+        assertThat(jwtTokenProvider.createRefreshToken(SOCIAL_LOGIN_USER2)).isNotEmpty();
+        assertThat(refreshToken).isEqualTo(SOCIAL_LOGIN_USER2.getRefreshToken());
         assertThatCode(() -> jwtTokenProvider.validateRefreshToken(refreshToken)).doesNotThrowAnyException();
     }
 
