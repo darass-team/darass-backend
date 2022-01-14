@@ -35,6 +35,10 @@ public class JwtTokenProvider {
     }
 
     public String createRefreshToken(SocialLoginUser socialLoginUser) {
+        if (isValidateToken(socialLoginUser.getRefreshToken(), secretKeyOfRefreshToken)) {
+            return socialLoginUser.getRefreshToken();
+        }
+
         Claims claims = Jwts.claims().setSubject(socialLoginUser.getId().toString());
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMillisecondsOfRefreshToken);
@@ -45,11 +49,15 @@ public class JwtTokenProvider {
     }
 
     public void validateAccessToken(String accessToken) {
-        validateToken(accessToken, secretKeyOfAccessToken);
+        if (!isValidateToken(accessToken, secretKeyOfAccessToken)) {
+            throw ExceptionWithMessageAndCode.INVALID_JWT_TOKEN.getException();
+        }
     }
 
     public void validateRefreshToken(String refreshToken) {
-        validateToken(refreshToken, secretKeyOfRefreshToken);
+        if (!isValidateToken(refreshToken, secretKeyOfRefreshToken)) {
+            throw ExceptionWithMessageAndCode.INVALID_REFRESH_TOKEN.getException();
+        }
     }
 
     public String getAccessTokenPayload(String accessToken) {
@@ -69,11 +77,12 @@ public class JwtTokenProvider {
             .compact();
     }
 
-    private void validateToken(String token, String secretKey) {
+    private boolean isValidateToken(String token, String secretKey) {
         try {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            return true;
         } catch (JwtException | IllegalArgumentException e) {
-            throw ExceptionWithMessageAndCode.INVALID_JWT_TOKEN.getException();
+            return false;
         }
     }
 }
