@@ -53,7 +53,7 @@ public class OAuthService {
 
         SocialLoginUser socialLoginUser = socialLoginUserRepository.findByRefreshToken(refreshToken)
             .orElseThrow(() -> {
-                throw ExceptionWithMessageAndCode.INVALID_REFRESH_TOKEN.getException();
+                throw ExceptionWithMessageAndCode.NOT_EXISTS_REFRESH_TOKEN.getException();
             });
 
         return new AccessTokenResponse(jwtTokenProvider.createAccessToken(socialLoginUser));
