@@ -7,14 +7,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.darass.SpringContainerTest;
 import com.darass.auth.controller.OAuthController;
 import com.darass.auth.controller.argumentresolver.AuthenticationPrincipalArgumentResolver;
 import com.darass.auth.dto.TokenRequest;
 import com.darass.auth.service.OAuthService;
 import com.darass.comment.controller.CommentController;
 import com.darass.comment.dto.CommentCreateRequest;
-import com.darass.SpringContainerTest;
 import com.darass.exception.ExceptionWithMessageAndCode;
+import com.darass.slack.SlackMessageSender;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,12 +41,15 @@ class ControllerAdviceTest extends SpringContainerTest {
     @Autowired
     private OAuthService oAuthService;
 
+    @Autowired
+    private SlackMessageSender slackMessageSender;
+
     @DisplayName("handleMethodArgumentNotValidException 메서드는 MethodArgumentNotValidException 예외가 발생하면 http 응답코드 400을 반환한다.")
     @Test
     void handleMethodArgumentNotValidException() throws Exception {
         mockMvc = MockMvcBuilders
             .standaloneSetup(commentController)
-            .setControllerAdvice(new ControllerAdvice())
+            .setControllerAdvice(new ControllerAdvice(slackMessageSender))
             .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver(oAuthService))
             .build();
 
@@ -64,7 +68,7 @@ class ControllerAdviceTest extends SpringContainerTest {
 
         mockMvc = MockMvcBuilders
             .standaloneSetup(oAuthController)
-            .setControllerAdvice(new ControllerAdvice())
+            .setControllerAdvice(new ControllerAdvice(slackMessageSender))
             .build();
 
         mockMvc.perform(post("/api/v1/login/oauth")
@@ -78,7 +82,7 @@ class ControllerAdviceTest extends SpringContainerTest {
     void handleUnauthorizedException() throws Exception {
         mockMvc = MockMvcBuilders
             .standaloneSetup(oAuthController)
-            .setControllerAdvice(new ControllerAdvice())
+            .setControllerAdvice(new ControllerAdvice(slackMessageSender))
             .build();
 
         mockMvc.perform(post("/api/v1/login/oauth")
@@ -92,7 +96,7 @@ class ControllerAdviceTest extends SpringContainerTest {
     void handleNotFoundException() throws Exception {
         mockMvc = MockMvcBuilders
             .standaloneSetup(commentController)
-            .setControllerAdvice(new ControllerAdvice())
+            .setControllerAdvice(new ControllerAdvice(slackMessageSender))
             .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver(oAuthService))
             .build();
 

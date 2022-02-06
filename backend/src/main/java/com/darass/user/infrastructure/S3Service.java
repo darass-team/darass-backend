@@ -8,7 +8,6 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -27,14 +26,11 @@ public class S3Service {
     private static final String FILE_NAME_FORMAT = "%s-%s-%s";
 
     private static final DateTimeFormatter NOW_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-
+    private final S3Client s3Client;
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
-
     @Value("${name}")
     private String profileName;
-
-    private final S3Client s3Client;
 
     public String upload(MultipartFile multipartFile) {
         File uploadFile = convert(multipartFile);

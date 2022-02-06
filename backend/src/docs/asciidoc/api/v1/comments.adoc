@@ -302,6 +302,7 @@ include::{snippets}/api/v1/comments/stat/get/monthly/success/response-fields.ado
 === 비밀 댓글 조회 (GET /api/v1/comments/{id}/secret-comment)
 
 ==== (성공) 비로그인 유저가 비밀 댓글 조회
+
 ==== Request
 
 include::{snippets}/api/v1/comments/secret-comment/guest-user/get/success/http-request.adoc[]
@@ -311,7 +312,6 @@ include::{snippets}/api/v1/comments/secret-comment/guest-user/get/success/reques
 
 include::{snippets}/api/v1/comments/secret-comment/guest-user/get/success/http-response.adoc[]
 include::{snippets}/api/v1/comments/secret-comment/guest-user/get/success/response-fields.adoc[]
-
 
 ==== (실패) 비로그인 유저가 비밀 댓글 조회
 
@@ -323,7 +323,6 @@ include::{snippets}/api/v1/comments/secret-comment/guest-user/get/fail-not-mine/
 
 include::{snippets}/api/v1/comments/secret-comment/guest-user/get/fail-not-mine/http-response.adoc[]
 include::{snippets}/api/v1/comments/secret-comment/guest-user/get/fail-not-mine/response-fields.adoc[]
-
 
 ==== (실패) 소셜 로그인 유저가 남의 비밀 댓글 조회
 

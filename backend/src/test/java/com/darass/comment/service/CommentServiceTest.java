@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 
+import com.darass.SpringContainerTest;
 import com.darass.auth.domain.KaKaoOAuthProvider;
 import com.darass.comment.domain.Comment;
 import com.darass.comment.domain.CommentLike;
@@ -27,7 +28,6 @@ import com.darass.commentalarm.domain.CommentAlarm;
 import com.darass.commentalarm.domain.CommentAlarmMachine;
 import com.darass.commentalarm.domain.CommentAlarmType;
 import com.darass.commentalarm.repository.CommentAlarmRepository;
-import com.darass.SpringContainerTest;
 import com.darass.exception.httpbasicexception.BadRequestException;
 import com.darass.exception.httpbasicexception.NotFoundException;
 import com.darass.exception.httpbasicexception.UnauthorizedException;
@@ -392,7 +392,7 @@ class CommentServiceTest extends SpringContainerTest {
     @Test
     void stat_monthly() {
         LocalDate endDate = LocalDate.now();
-        LocalDate startDate = endDate.minusMonths(4L).minusDays(1L);
+        LocalDate startDate = endDate.minusMonths(4L);
         CommentStatRequest request = new CommentStatRequest("MONTHLY", project.getSecretKey(),
             startDate, endDate);
         CommentStatResponse commentStatResponse = commentService.giveStat(request);

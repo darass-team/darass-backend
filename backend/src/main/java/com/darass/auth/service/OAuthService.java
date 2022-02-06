@@ -56,10 +56,17 @@ public class OAuthService {
                 throw ExceptionWithMessageAndCode.NOT_EXISTS_REFRESH_TOKEN.getException();
             });
 
-        return new AccessTokenResponse(jwtTokenProvider.createAccessToken(socialLoginUser));
+        if (jwtTokenProvider.isValidatedAccessToken(socialLoginUser.getAccessToken())) {
+            throw ExceptionWithMessageAndCode.ALREADY_VALIDATED_ACCESS_TOKEN.getException();
+        }
+
+        String accessToken = jwtTokenProvider.createAccessToken(socialLoginUser);
+        socialLoginUser.updateAccessToken(accessToken);
+        return new AccessTokenResponse(accessToken);
     }
 
     public void logOut(SocialLoginUser socialLoginUser) {
+        socialLoginUser.deleteAccessToken();
         socialLoginUser.deleteRefreshToken();
     }
 }

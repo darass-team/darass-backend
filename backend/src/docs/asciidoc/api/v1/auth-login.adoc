@@ -25,15 +25,24 @@ include::{snippets}/api/v1/login-refresh/post/success/http-request.adoc[]
 include::{snippets}/api/v1/login-refresh/post/success/http-response.adoc[]
 include::{snippets}/api/v1/login-refresh/post/success/response-fields.adoc[]
 
-//==== Response (실패 - 리프레시 토큰의 인증이 실패하는 경우)
-//
-//include::{snippets}/api/v1/login-refresh/post/fail/http-response.adoc[]
-//include::{snippets}/api/v1/login-refresh/post/fail/response-fields.adoc[]
+==== Response (실패 - 리프레시 토큰이 존재하지 않는 경우)
 
+include::{snippets}/api/v1/login-refresh-not-refresh-token/post/fail/http-response.adoc[]
+include::{snippets}/api/v1/login-refresh-not-refresh-token/post/fail/response-fields.adoc[]
+
+==== Response (실패 - 이미 액세스 토큰이 유효한 경우)
+
+include::{snippets}/api/v1/login-refresh-already-validated-access-token/post/fail/http-response.adoc[]
+include::{snippets}/api/v1/login-refresh-already-validated-access-token/post/fail/response-fields.adoc[]
+
+==== Response (실패 - 리프레시 토큰이 유효하지 않는 경우)
+
+include::{snippets}/api/v1/login-refresh-not-validated-refresh-token/post/fail/http-response.adoc[]
+include::{snippets}/api/v1/login-refresh-not-validated-refresh-token/post/fail/response-fields.adoc[]
 
 === 로그 아웃 (POST /api/v1/log-out)
 
-==== Response (성공 - 리프레시 토큰의 인증이 실패하는 경우)
+==== Response (성공 - 로그 아웃이 성공하는 경우)
 
 include::{snippets}/api/v1/log-out/post/success/http-request.adoc[]
 include::{snippets}/api/v1/log-out/post/success/http-response.adoc[]

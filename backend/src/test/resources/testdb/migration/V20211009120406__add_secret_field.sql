@@ -1,1 +1,2 @@
-alter table comment add secret BOOLEAN;
+alter table comment
+    add secret BOOLEAN;

@@ -1,4 +1,5 @@
-alter table comment_alarm add receiver_id bigint;
+alter table comment_alarm
+    add receiver_id bigint;
 
 alter table comment_alarm
     add constraint comment_alarm_fk_receiver

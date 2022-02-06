@@ -27,11 +27,17 @@ public class JwtTokenProvider {
     private long validityInMillisecondsOfRefreshToken;
 
     public String createAccessToken(SocialLoginUser socialLoginUser) {
+        if (isValidateToken(socialLoginUser.getAccessToken(), secretKeyOfAccessToken)) {
+            return socialLoginUser.getAccessToken();
+        }
+
         Claims claims = Jwts.claims().setSubject(socialLoginUser.getId().toString());
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMillisecondsOfAccessToken);
 
-        return createJwtToken(claims, now, validity, secretKeyOfAccessToken);
+        String accessToken = createJwtToken(claims, now, validity, secretKeyOfAccessToken);
+        socialLoginUser.updateAccessToken(accessToken);
+        return accessToken;
     }
 
     public String createRefreshToken(SocialLoginUser socialLoginUser) {
@@ -46,6 +52,10 @@ public class JwtTokenProvider {
         String refreshToken = createJwtToken(claims, now, validity, secretKeyOfRefreshToken);
         socialLoginUser.updateRefreshToken(refreshToken);
         return refreshToken;
+    }
+
+    public boolean isValidatedAccessToken(String accessToken) {
+        return isValidateToken(accessToken, secretKeyOfAccessToken);
     }
 
     public void validateAccessToken(String accessToken) {

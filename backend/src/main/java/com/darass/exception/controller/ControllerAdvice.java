@@ -6,25 +6,35 @@ import com.darass.exception.httpbasicexception.ConflictException;
 import com.darass.exception.httpbasicexception.NotFoundException;
 import com.darass.exception.httpbasicexception.UnauthorizedException;
 import com.darass.slack.SlackMessageSender;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@RequiredArgsConstructor
 @Slf4j
 @RestControllerAdvice
 public class ControllerAdvice {
 
-    @Autowired
-    private SlackMessageSender slackMessageSender;
+    private final SlackMessageSender slackMessageSender;
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        return new ExceptionResponse(e.getMessage(), HttpStatus.BAD_REQUEST.value());
+        BindingResult bindingResult = e.getBindingResult();
+
+        StringBuilder builder = new StringBuilder();
+        String message = "%s 입력된 값: [%s]";
+        for (FieldError fieldError : bindingResult.getFieldErrors()) {
+            builder.append(String.format(message, fieldError.getDefaultMessage(), fieldError.getRejectedValue()));
+        }
+
+        return new ExceptionResponse(builder.toString(), HttpStatus.BAD_REQUEST.value());
     }
 
     @ExceptionHandler(BadRequestException.class)

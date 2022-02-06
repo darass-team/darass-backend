@@ -40,12 +40,6 @@ class CommentAlarmControllerTest extends MockSpringContainerTest {
     private static final SocialLoginUser SENDER;
     private static final SocialLoginUser RECEIVER;
 
-    @MockBean
-    CommentAlarmService mockCommentAlarmService;
-
-    @MockBean
-    OAuthService mockOAuthService;
-
     static {
         SENDER = SocialLoginUser
             .builder()
@@ -71,6 +65,11 @@ class CommentAlarmControllerTest extends MockSpringContainerTest {
             .userType("SocialLoginUser")
             .build();
     }
+
+    @MockBean
+    CommentAlarmService mockCommentAlarmService;
+    @MockBean
+    OAuthService mockOAuthService;
 
     @BeforeEach
     void setUp() {

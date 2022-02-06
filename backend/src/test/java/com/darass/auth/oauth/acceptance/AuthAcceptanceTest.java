@@ -22,14 +22,17 @@ import com.darass.user.domain.SocialLoginUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
+import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 @DisplayName("Auth 인수 테스트")
 class AuthAcceptanceTest extends MockSpringContainerTest {
@@ -37,6 +40,9 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
     private String authorizationCode;
 
     private SocialLoginUser socialLoginUser;
+
+    @Autowired
+    private EntityManager entityManager;
 
     @BeforeEach
     public void setup() {
@@ -83,6 +89,7 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
     }
 
     @DisplayName("refresh 토큰을 통해 accessToken을 재발급 받는다.")
+    @Transactional
     @Test
     void refreshToken() throws Exception {
         //given
@@ -91,6 +98,8 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
 
         ResultActions tokenRequestResultActions = 토큰_발급_요청(KaKaoOAuthProvider.NAME, authorizationCode);
         토큰_발급됨(tokenRequestResultActions);
+        socialLoginUser.updateAccessToken(null);
+        entityManager.flush();
 
         String jsonResponse = tokenRequestResultActions.andReturn().getResponse().getContentAsString();
 
@@ -133,6 +142,30 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
         리프레시_토큰_요청_객체가_존재_하지않아_엑세스_토큰_재발급_실패됨(tokenRefreshResultActions);
     }
 
+    @DisplayName("유효한 refreshToken이 주어지고, DB의 accessToken이 유효하다면 예외를 던진다.")
+    @Test
+    void getAccessTokenWithRefreshToken_alreay_validated_access_token() throws Exception {
+        //given
+        given(oAuthProviderFactory.getOAuthProvider(any())).willReturn(kaKaoOAuthProvider);
+        given(kaKaoOAuthProvider.requestSocialLoginUser(any())).willReturn(socialLoginUser);
+
+        ResultActions tokenRequestResultActions = 토큰_발급_요청(KaKaoOAuthProvider.NAME, authorizationCode);
+        토큰_발급됨(tokenRequestResultActions);
+
+        String jsonResponse = tokenRequestResultActions.andReturn().getResponse().getContentAsString();
+
+        TokenResponse tokenResponse = new ObjectMapper().readValue(jsonResponse, TokenResponse.class);
+        String refreshToken = tokenResponse.getRefreshToken();
+
+        // when
+        Thread.sleep(1000);
+
+        ResultActions tokenRefreshResultActions = 토큰_리프레시_요청(new RefreshTokenRequest(refreshToken));
+
+        이미_유효한_액세스_토큰으로_인해_액세스_토큰_재발급_실패됨(tokenRefreshResultActions);
+    }
+
+
     @DisplayName("유효하지 않는 refresh 토큰이라면, accessToken을 재발급을 실패한다.")
     @Test
     void refreshToken_invalid_refresh_token_fail() throws Exception {
@@ -151,7 +184,6 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
     @DisplayName("엑세스 토큰을 보내서 로그아웃을 진행한다.")
     @Test
     void logOut() throws Exception {
-        //given
         given(oAuthProviderFactory.getOAuthProvider(any())).willReturn(kaKaoOAuthProvider);
         given(kaKaoOAuthProvider.requestSocialLoginUser(any())).willReturn(socialLoginUser);
 
@@ -167,20 +199,27 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
     private void 리프레시_토큰_요청_객체가_존재_하지않아_엑세스_토큰_재발급_실패됨(ResultActions tokenRefreshResultActions)
         throws Exception {
         tokenRefreshResultActions.andExpect(status().is5xxServerError());
-
-        토큰_인증_로그인_실패_rest_doc_작성(tokenRefreshResultActions);
     }
 
     private void 리프레시_토큰이_존재_하지않아_엑세스_토큰_재발급_실패됨(ResultActions tokenRefreshResultActions)
         throws Exception {
         tokenRefreshResultActions.andExpect(status().isBadRequest());
+
+        존재하지_않는_리프레시_토큰으로_인해_액세스_토큰_재발급_실패_rest_doc_작성(tokenRefreshResultActions);
+    }
+
+    private void 이미_유효한_액세스_토큰으로_인해_액세스_토큰_재발급_실패됨(ResultActions tokenRefreshResultActions)
+        throws Exception {
+        tokenRefreshResultActions.andExpect(status().is4xxClientError());
+
+        이미_유효한_엑세스_토큰으로_인해_액세스_토큰_재발급_실패_rest_doc_작성(tokenRefreshResultActions);
     }
 
     private void 유효하지_않은_리프레쉬_토큰으로_인해_엑세스_토큰_재발급_실패됨(ResultActions tokenRefreshResultActions)
         throws Exception {
         tokenRefreshResultActions.andExpect(status().is4xxClientError());
 
-        토큰_인증_로그인_실패_rest_doc_작성(tokenRefreshResultActions);
+        유효하지_않은_리프레시_토큰으로_인해_액세스_토큰_재발급_실패_rest_doc_작성(tokenRefreshResultActions);
     }
 
     private ResultActions 토큰_리프레시_요청(RefreshTokenRequest refreshTokenRequest) throws Exception {
@@ -268,6 +307,36 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
     private void 토큰_인증_로그인_실패_rest_doc_작성(ResultActions resultActions) throws Exception {
         resultActions.andDo(
             document("api/v1/auth-login/post/fail",
+                responseFields(
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("에러 메시지"),
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("에러 코드")
+                ))
+        );
+    }
+
+    private void 존재하지_않는_리프레시_토큰으로_인해_액세스_토큰_재발급_실패_rest_doc_작성(ResultActions resultActions) throws Exception {
+        resultActions.andDo(
+            document("api/v1/login-refresh-not-refresh-token/post/fail",
+                responseFields(
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("에러 메시지"),
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("에러 코드")
+                ))
+        );
+    }
+
+    private void 이미_유효한_엑세스_토큰으로_인해_액세스_토큰_재발급_실패_rest_doc_작성(ResultActions resultActions) throws Exception {
+        resultActions.andDo(
+            document("api/v1/login-refresh-already-validated-access-token/post/fail",
+                responseFields(
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("에러 메시지"),
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("에러 코드")
+                ))
+        );
+    }
+
+    private void 유효하지_않은_리프레시_토큰으로_인해_액세스_토큰_재발급_실패_rest_doc_작성(ResultActions resultActions) throws Exception {
+        resultActions.andDo(
+            document("api/v1/login-refresh-not-validated-refresh-token/post/fail",
                 responseFields(
                     fieldWithPath("message").type(JsonFieldType.STRING).description("에러 메시지"),
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("에러 코드")

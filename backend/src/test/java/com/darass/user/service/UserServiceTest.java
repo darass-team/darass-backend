@@ -2,11 +2,11 @@ package com.darass.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.darass.SpringContainerTest;
 import com.darass.comment.domain.Comment;
 import com.darass.comment.domain.CommentLike;
 import com.darass.comment.repository.CommentLikeRepository;
 import com.darass.comment.repository.CommentRepository;
-import com.darass.SpringContainerTest;
 import com.darass.exception.ExceptionWithMessageAndCode;
 import com.darass.project.domain.Project;
 import com.darass.project.repository.ProjectRepository;
@@ -15,7 +15,6 @@ import com.darass.user.domain.SocialLoginUser;
 import com.darass.user.domain.User;
 import com.darass.user.dto.UserResponse;
 import com.darass.user.dto.UserUpdateRequest;
-import com.darass.user.infrastructure.S3Service;
 import com.darass.user.repository.UserRepository;
 import javax.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
@@ -23,7 +22,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 @DisplayName("UserService 클래스")
 class UserServiceTest extends SpringContainerTest {
