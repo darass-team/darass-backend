@@ -132,4 +132,15 @@ class OAuthServiceTest extends MockSpringContainerTest {
             .isInstanceOf(ExceptionWithMessageAndCode.SHOULD_LOGIN.getException().getClass());
     }
 
+    @DisplayName("로그아웃을 하면 액세스 토큰과 리프레시 토큰이 null이 된다.")
+    @Test
+    void log_out() {
+        TokenRequest tokenRequest = new TokenRequest(KaKaoOAuthProvider.NAME, AUTHORIZATION_CODE);
+        oAuthService.oauthLogin(tokenRequest);
+
+        oAuthService.logOut(socialLoginUser);
+        assertThat(socialLoginUser.getAccessToken()).isNull();
+        assertThat(socialLoginUser.getRefreshToken()).isNull();
+    }
+
 }

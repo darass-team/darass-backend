@@ -60,6 +60,7 @@ public class OAuthService {
     }
 
     public void logOut(SocialLoginUser socialLoginUser) {
+        socialLoginUser.deleteAccessToken();
         socialLoginUser.deleteRefreshToken();
     }
 }

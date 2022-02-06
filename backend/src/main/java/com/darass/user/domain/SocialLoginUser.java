@@ -71,6 +71,10 @@ public class SocialLoginUser extends User {
         this.refreshToken = refreshToken;
     }
 
+    public void deleteAccessToken() {
+        accessToken = null;
+    }
+
     public void deleteRefreshToken() {
         refreshToken = null;
     }
