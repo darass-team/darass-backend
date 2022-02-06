@@ -1,5 +1,8 @@
 <configuration>
 
+  <springProperty scope="context" name="LOGBACK_HOST" source="logback.destination.host"/>
+  <springProperty scope="context" name="LOGBACK_PORT" source="logback.destination.port"/>
+
   <springProfile name="!prod">
     <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
       <encoder>
@@ -74,8 +77,4 @@
       <appender-ref ref="stash"/>
     </root>
   </springProfile>
-
-  <springProperty name="LOGBACK_PORT" scope="context" source="logback.destination.port"/>
-
-  <springProperty name="LOGBACK_HOST" scope="context" source="logback.destination.host"/>
 </configuration>

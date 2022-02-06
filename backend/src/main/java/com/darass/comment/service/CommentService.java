@@ -184,6 +184,7 @@ public class CommentService {
             .build());
     }
 
+    @Transactional(readOnly = true)
     public CommentStatResponse giveStat(CommentStatRequest request) {
         List<CommentStat> commentStats = commentCountStrategyFactory.findStrategy(request.getPeriodicity())
             .calculateCount(request.getProjectKey(), request.getStartDate().atTime(LocalTime.MIN),
@@ -191,6 +192,7 @@ public class CommentService {
         return new CommentStatResponse(commentStats);
     }
 
+    @Transactional(readOnly = true)
     public CommentResponse readSecretComment(Long id, User user, CommentReadSecretCommentRequest request) {
         user = findRegisteredUser(user, request.getGuestUserId(), request.getGuestUserPassword());
         Comment comment = findCommentById(id);
