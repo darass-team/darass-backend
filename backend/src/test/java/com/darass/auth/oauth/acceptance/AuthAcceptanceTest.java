@@ -199,27 +199,27 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
     private void 리프레시_토큰_요청_객체가_존재_하지않아_엑세스_토큰_재발급_실패됨(ResultActions tokenRefreshResultActions)
         throws Exception {
         tokenRefreshResultActions.andExpect(status().is5xxServerError());
-
-        토큰_인증_로그인_실패_rest_doc_작성(tokenRefreshResultActions);
     }
 
     private void 리프레시_토큰이_존재_하지않아_엑세스_토큰_재발급_실패됨(ResultActions tokenRefreshResultActions)
         throws Exception {
         tokenRefreshResultActions.andExpect(status().isBadRequest());
+
+        존재하지_않는_리프레시_토큰으로_인해_액세스_토큰_재발급_실패_rest_doc_작성(tokenRefreshResultActions);
     }
 
     private void 이미_유효한_액세스_토큰으로_인해_액세스_토큰_재발급_실패됨(ResultActions tokenRefreshResultActions)
         throws Exception {
         tokenRefreshResultActions.andExpect(status().is4xxClientError());
 
-        토큰_인증_로그인_실패_rest_doc_작성(tokenRefreshResultActions);
+        이미_유효한_엑세스_토큰으로_인해_액세스_토큰_재발급_실패_rest_doc_작성(tokenRefreshResultActions);
     }
 
     private void 유효하지_않은_리프레쉬_토큰으로_인해_엑세스_토큰_재발급_실패됨(ResultActions tokenRefreshResultActions)
         throws Exception {
         tokenRefreshResultActions.andExpect(status().is4xxClientError());
 
-        토큰_인증_로그인_실패_rest_doc_작성(tokenRefreshResultActions);
+        유효하지_않은_리프레시_토큰으로_인해_액세스_토큰_재발급_실패_rest_doc_작성(tokenRefreshResultActions);
     }
 
     private ResultActions 토큰_리프레시_요청(RefreshTokenRequest refreshTokenRequest) throws Exception {
@@ -307,6 +307,36 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
     private void 토큰_인증_로그인_실패_rest_doc_작성(ResultActions resultActions) throws Exception {
         resultActions.andDo(
             document("api/v1/auth-login/post/fail",
+                responseFields(
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("에러 메시지"),
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("에러 코드")
+                ))
+        );
+    }
+
+    private void 존재하지_않는_리프레시_토큰으로_인해_액세스_토큰_재발급_실패_rest_doc_작성(ResultActions resultActions) throws Exception {
+        resultActions.andDo(
+            document("api/v1/login-refresh-not-refresh-token/post/fail",
+                responseFields(
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("에러 메시지"),
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("에러 코드")
+                ))
+        );
+    }
+
+    private void 이미_유효한_엑세스_토큰으로_인해_액세스_토큰_재발급_실패_rest_doc_작성(ResultActions resultActions) throws Exception {
+        resultActions.andDo(
+            document("api/v1/login-refresh-already-validated-access-token/post/fail",
+                responseFields(
+                    fieldWithPath("message").type(JsonFieldType.STRING).description("에러 메시지"),
+                    fieldWithPath("code").type(JsonFieldType.NUMBER).description("에러 코드")
+                ))
+        );
+    }
+
+    private void 유효하지_않은_리프레시_토큰으로_인해_액세스_토큰_재발급_실패_rest_doc_작성(ResultActions resultActions) throws Exception {
+        resultActions.andDo(
+            document("api/v1/login-refresh-not-validated-refresh-token/post/fail",
                 responseFields(
                     fieldWithPath("message").type(JsonFieldType.STRING).description("에러 메시지"),
                     fieldWithPath("code").type(JsonFieldType.NUMBER).description("에러 코드")
