@@ -392,7 +392,7 @@ class CommentServiceTest extends SpringContainerTest {
     @Test
     void stat_monthly() {
         LocalDate endDate = LocalDate.now();
-        LocalDate startDate = endDate.minusMonths(4L).minusDays(1L);
+        LocalDate startDate = endDate.minusMonths(4L);
         CommentStatRequest request = new CommentStatRequest("MONTHLY", project.getSecretKey(),
             startDate, endDate);
         CommentStatResponse commentStatResponse = commentService.giveStat(request);
