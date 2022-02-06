@@ -14,10 +14,13 @@ import com.darass.auth.infrastructure.JwtTokenProvider;
 import com.darass.exception.ExceptionWithMessageAndCode;
 import com.darass.user.domain.SocialLoginUser;
 import java.util.Optional;
+import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.transaction.annotation.Transactional;
 
 @DisplayName("OAuthService 클래스")
 class OAuthServiceTest extends MockSpringContainerTest {
@@ -29,6 +32,9 @@ class OAuthServiceTest extends MockSpringContainerTest {
 
     @Autowired
     private OAuthService oAuthService;
+
+    @Autowired
+    private EntityManager entityManager;
 
     private SocialLoginUser socialLoginUser;
 
@@ -105,12 +111,15 @@ class OAuthServiceTest extends MockSpringContainerTest {
         assertThat(result.getEmail()).isEqualTo(socialLoginUser.getEmail());
     }
 
-    @DisplayName("유효한 refreshToken이 주어지면, accessToken을 발급해준다.")
+    @DisplayName("유효한 refreshToken이 주어지고, DB의 accessToken이 유효하지 않다면 accessToken을 발급해준다.")
+    @Transactional
     @Test
     void getAccessTokenWithRefreshToken() throws InterruptedException {
         //given
         TokenRequest tokenRequest = new TokenRequest(KaKaoOAuthProvider.NAME, AUTHORIZATION_CODE);
         TokenResponse tokenResponse = oAuthService.oauthLogin(tokenRequest);
+        socialLoginUser.updateAccessToken(null);
+        entityManager.flush();
 
         Thread.sleep(1000);
 
@@ -119,6 +128,18 @@ class OAuthServiceTest extends MockSpringContainerTest {
 
         //then
         assertThat(tokenResponse.getAccessToken()).isNotEqualTo(accessTokenResponse.getAccessToken());
+    }
+
+    @DisplayName("유효한 refreshToken이 주어지고, DB의 accessToken이 유효하다면 예외를 던진다.")
+    @Test
+    void getAccessTokenWithRefreshToken_alreay_validated_access_token() throws InterruptedException {
+        TokenRequest tokenRequest = new TokenRequest(KaKaoOAuthProvider.NAME, AUTHORIZATION_CODE);
+        TokenResponse tokenResponse = oAuthService.oauthLogin(tokenRequest);
+
+        Thread.sleep(1000);
+
+        assertThatThrownBy(() -> oAuthService.getAccessTokenWithRefreshToken(tokenResponse.getRefreshToken()))
+        .isInstanceOf(ExceptionWithMessageAndCode.ALREADY_VALIDATED_ACCESS_TOKEN.getException().getClass());
     }
 
     @DisplayName("refreshAccessTokenWithRefreshToken 메서드는 refreshToken이 db에 존재하지 않는다면, 예외를 던진다.")

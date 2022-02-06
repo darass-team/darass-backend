@@ -54,6 +54,10 @@ public class JwtTokenProvider {
         return refreshToken;
     }
 
+    public boolean isValidatedAccessToken(String accessToken) {
+        return isValidateToken(accessToken, secretKeyOfAccessToken);
+    }
+
     public void validateAccessToken(String accessToken) {
         if (!isValidateToken(accessToken, secretKeyOfAccessToken)) {
             throw ExceptionWithMessageAndCode.INVALID_JWT_TOKEN.getException();
