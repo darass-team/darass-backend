@@ -83,6 +83,7 @@ class OAuthServiceTest extends MockSpringContainerTest {
         assertThat(possibleSocialLoginUser.isPresent()).isTrue();
 
         SocialLoginUser socialLoginUser = possibleSocialLoginUser.get();
+        assertThat(socialLoginUser.getAccessToken()).isEqualTo(tokenResponse.getAccessToken());
         assertThat(socialLoginUser.getRefreshToken()).isEqualTo(tokenResponse.getRefreshToken());
     }
 

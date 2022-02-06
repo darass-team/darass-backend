@@ -22,14 +22,17 @@ public class SocialLoginUser extends User {
 
     private String refreshToken;
 
+    private String accessToken;
+
     @Builder
     public SocialLoginUser(Long id, String nickName, String profileImageUrl, String userType, String oauthId,
-        String oauthProvider, String email, String refreshToken) {
+        String oauthProvider, String email, String refreshToken, String accessToken) {
         super(id, nickName, profileImageUrl, userType);
         this.oauthId = oauthId;
         this.oauthProvider = oauthProvider;
         this.email = email;
         this.refreshToken = refreshToken;
+        this.accessToken = accessToken;
     }
 
     @Override
@@ -58,6 +61,10 @@ public class SocialLoginUser extends User {
             String imageUrl = s3Service.upload(profileImageFile);
             changeProfileImageUrl(imageUrl);
         }
+    }
+
+    public void updateAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 
     public void updateRefreshToken(String refreshToken) {
