@@ -30,7 +30,7 @@ public class OAuthController {
     }
 
     @PostMapping("/login/refresh")
-    public ResponseEntity<AccessTokenResponse> regenerateAccessToken(@RequestBody(required = false) @Valid RefreshTokenRequest refreshTokenRequest) {
+    public ResponseEntity<AccessTokenResponse> regenerateAccessToken(@RequestBody @Valid RefreshTokenRequest refreshTokenRequest) {
         return ResponseEntity.status(HttpStatus.OK)
             .body(oAuthService.getAccessTokenWithRefreshToken(refreshTokenRequest.getRefreshToken()));
     }
