@@ -33,27 +33,26 @@ public class CommentControllerTest {
     private static GuestUser guestUser;
     private static SocialLoginUser socialLoginUser;
 
-    @Autowired
-    private MockMvc mockMvc;
-
     static {
         guestUser = GuestUser.builder()
-                .id(1L)
-                .nickName("user")
-                .password("password")
-                .build();
+            .id(1L)
+            .nickName("user")
+            .password("password")
+            .build();
 
         socialLoginUser = SocialLoginUser.builder()
-                .id(1L)
-                .nickName("우기")
-                .profileImageUrl("http://프로필이미지-url")
-                .userType("socialLoginUser")
-                .email("bbwwpark@naver.com")
-                .oauthProvider("kakao")
-                .oauthId("1234")
-                .build();
+            .id(1L)
+            .nickName("우기")
+            .profileImageUrl("http://프로필이미지-url")
+            .userType("socialLoginUser")
+            .email("bbwwpark@naver.com")
+            .oauthProvider("kakao")
+            .oauthId("1234")
+            .build();
     }
 
+    @Autowired
+    private MockMvc mockMvc;
     @MockBean
     private CommentService commentService;
 
@@ -69,16 +68,16 @@ public class CommentControllerTest {
         Long commentId = 1L;
         GuestUser user = new GuestUser();
         given(commentService.readSecretComment(eq(commentId), eq(user), any()))
-                .willReturn(new CommentResponse(1L, "content", "url", true, true, LocalDateTime.now(), LocalDateTime.now(),
-                        null, UserResponse.of(socialLoginUser), null));
+            .willReturn(new CommentResponse(1L, "content", "url", true, true, LocalDateTime.now(), LocalDateTime.now(),
+                null, UserResponse.of(socialLoginUser), null));
 
         mockMvc.perform(get("/api/v1/comments/" + commentId + "/secret-comment")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .param("guestUserId", String.valueOf(guestUser.getId()))
-                        .param("guestUserPassword", guestUser.getPassword()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").value("content"))
-                .andExpect(jsonPath("$.secret").value(true));
+            .contentType(MediaType.APPLICATION_JSON)
+            .param("guestUserId", String.valueOf(guestUser.getId()))
+            .param("guestUserPassword", guestUser.getPassword()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content").value("content"))
+            .andExpect(jsonPath("$.secret").value(true));
     }
 
     @DisplayName("비로그인 유저가 비밀번호를 틀리면 비밀 댓글을 조회할 수 없다.")
@@ -88,13 +87,13 @@ public class CommentControllerTest {
         GuestUser user = new GuestUser();
 
         given(commentService.readSecretComment(eq(commentId), eq(user), any()))
-                .willThrow(UnauthorizedException.class);
+            .willThrow(UnauthorizedException.class);
 
         mockMvc.perform(get("/api/v1/comments/" + commentId + "/secret-comment")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .param("guestUserId", String.valueOf(guestUser.getId()))
-                        .param("guestUserPassword", "Invalid"))
-                .andExpect(status().isUnauthorized());
+            .contentType(MediaType.APPLICATION_JSON)
+            .param("guestUserId", String.valueOf(guestUser.getId()))
+            .param("guestUserPassword", "Invalid"))
+            .andExpect(status().isUnauthorized());
     }
 
     @DisplayName("소셜로그인 유저는 남의 비밀 댓글을 조회할 수 없다.")
@@ -103,14 +102,14 @@ public class CommentControllerTest {
         Long commentId = 1L;
 
         given(oAuthService.findSocialLoginUserByAccessToken(ACCESS_TOKEN))
-                .willReturn(socialLoginUser);
+            .willReturn(socialLoginUser);
 
         given(commentService.readSecretComment(eq(commentId), eq(socialLoginUser), any()))
-                .willThrow(UnauthorizedException.class);
+            .willThrow(UnauthorizedException.class);
 
         mockMvc.perform(get("/api/v1/comments/" + commentId + "/secret-comment")
-                        .header("Authorization", "Bearer " + ACCESS_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized());
+            .header("Authorization", "Bearer " + ACCESS_TOKEN)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isUnauthorized());
     }
 }

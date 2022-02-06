@@ -22,14 +22,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.darass.MockSpringContainerTest;
-import com.darass.SpringContainerTest;
 import com.darass.auth.infrastructure.JwtTokenProvider;
 import com.darass.comment.dto.CommentCreateRequest;
 import com.darass.comment.dto.CommentReadSecretCommentRequest;
 import com.darass.comment.dto.CommentResponse;
 import com.darass.comment.dto.CommentResponses;
 import com.darass.comment.dto.CommentUpdateRequest;
-import com.darass.commentalarm.domain.CommentAlarmMachine;
 import com.darass.exception.ExceptionWithMessageAndCode;
 import com.darass.project.domain.Project;
 import com.darass.project.repository.ProjectRepository;
@@ -43,7 +41,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.ResultActions;
@@ -1485,7 +1482,7 @@ class CommentAcceptanceTest extends MockSpringContainerTest {
 
     @DisplayName("비로그인 유저가 비밀 댓글을 조회한다.")
     @Test
-    void readSecretComment_guest_user() throws Exception{
+    void readSecretComment_guest_user() throws Exception {
         CommentResponse commentResponse = 비로그인_댓글_등록됨_Response_반환("content1", "url", true);
         소셜_로그인_대댓글_등록됨("content2", "url", commentResponse.getId(), true);
         소셜_로그인_대댓글_등록됨("content3", "url", commentResponse.getId(), true);
@@ -1542,7 +1539,7 @@ class CommentAcceptanceTest extends MockSpringContainerTest {
 
     @DisplayName("소셜 로그인 유저는 남의 비밀 댓글을 조회할 수 없다.")
     @Test
-    void readSecretComment_login_user() throws Exception{
+    void readSecretComment_login_user() throws Exception {
         CommentResponse commentResponse1 = 소셜_로그인_댓글_등록됨_Response_반환("content1", "url");
         CommentResponse commentResponse2 = 비로그인_댓글_등록됨_Response_반환("content2", "url", true);
         Long commentId2 = commentResponse2.getId();
@@ -1602,7 +1599,7 @@ class CommentAcceptanceTest extends MockSpringContainerTest {
 
     @DisplayName("비로그인 유저가 비밀번호를 틀리면 비밀 댓글을 조회할 수 없다.")
     @Test
-    void readSecretComment_guest_user_exception() throws Exception{
+    void readSecretComment_guest_user_exception() throws Exception {
         CommentResponse commentResponse = 비로그인_댓글_등록됨_Response_반환("content2", "url");
         Long commentId = commentResponse.getId();
         UserResponse user = commentResponse.getUser();

@@ -3,11 +3,11 @@ package com.darass.auth.api.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.darass.SpringContainerTest;
 import com.darass.auth.domain.GithubOAuthProvider;
 import com.darass.auth.domain.KaKaoOAuthProvider;
 import com.darass.auth.domain.NaverOAuthProvider;
 import com.darass.auth.domain.OAuthProviderFactory;
-import com.darass.SpringContainerTest;
 import com.darass.exception.ExceptionWithMessageAndCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

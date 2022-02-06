@@ -1,1 +1,2 @@
-alter table comment alter column content longtext;
+alter table comment
+    alter column content longtext;

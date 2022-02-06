@@ -1,11 +1,11 @@
 create table comment_alarm
 (
-    id      bigint not null auto_increment,
+    id                 bigint      not null auto_increment,
     comment_alarm_type varchar(31) not null,
-    created_date  TIMESTAMP,
-    modified_date TIMESTAMP,
-    sender_id       bigint,
-    comment_id    bigint,
+    created_date       TIMESTAMP,
+    modified_date      TIMESTAMP,
+    sender_id          bigint,
+    comment_id         bigint,
     primary key (id)
 );
 

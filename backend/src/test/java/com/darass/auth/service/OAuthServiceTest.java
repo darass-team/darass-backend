@@ -19,7 +19,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.transaction.annotation.Transactional;
 
 @DisplayName("OAuthService 클래스")
@@ -139,7 +138,7 @@ class OAuthServiceTest extends MockSpringContainerTest {
         Thread.sleep(1000);
 
         assertThatThrownBy(() -> oAuthService.getAccessTokenWithRefreshToken(tokenResponse.getRefreshToken()))
-        .isInstanceOf(ExceptionWithMessageAndCode.ALREADY_VALIDATED_ACCESS_TOKEN.getException().getClass());
+            .isInstanceOf(ExceptionWithMessageAndCode.ALREADY_VALIDATED_ACCESS_TOKEN.getException().getClass());
     }
 
     @DisplayName("refreshAccessTokenWithRefreshToken 메서드는 refreshToken이 db에 존재하지 않는다면, 예외를 던진다.")
