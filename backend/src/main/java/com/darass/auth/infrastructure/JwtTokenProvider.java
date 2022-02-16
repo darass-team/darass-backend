@@ -60,7 +60,7 @@ public class JwtTokenProvider {
 
     public void validateAccessToken(String accessToken) {
         if (!isValidateToken(accessToken, secretKeyOfAccessToken)) {
-            throw ExceptionWithMessageAndCode.INVALID_JWT_TOKEN.getException();
+            throw ExceptionWithMessageAndCode.INVALID_ACCESS_TOKEN.getException();
         }
     }
 
@@ -74,7 +74,7 @@ public class JwtTokenProvider {
         try {
             return Jwts.parser().setSigningKey(secretKeyOfAccessToken).parseClaimsJws(accessToken).getBody().getSubject();
         } catch (MalformedJwtException e) {
-            throw ExceptionWithMessageAndCode.INVALID_JWT_TOKEN.getException();
+            throw ExceptionWithMessageAndCode.INVALID_ACCESS_TOKEN.getException();
         }
     }
 

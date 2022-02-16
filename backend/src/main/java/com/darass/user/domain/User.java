@@ -13,6 +13,7 @@ import javax.persistence.InheritanceType;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
 @NoArgsConstructor
@@ -20,6 +21,7 @@ import lombok.NoArgsConstructor;
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "user_type")
 @Entity
+@ToString
 public abstract class User extends BaseTimeEntity {
 
     private static final int NICKNAME_LENGTH_LIMIT = 20;
@@ -75,6 +77,7 @@ public abstract class User extends BaseTimeEntity {
     public void changeNickName(String nickName) {
         validateNickName(nickName);
         this.nickName = nickName;
+        this.nickName = nickName;
     }
 
     public void setUserType(String userType) {
@@ -88,4 +91,5 @@ public abstract class User extends BaseTimeEntity {
     public void changeHasRecentAlarm(boolean hasRecentAlarm) {
         this.hasRecentAlarm = hasRecentAlarm;
     }
+
 }

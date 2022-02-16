@@ -87,7 +87,7 @@ class JwtTokenProviderTest extends SpringContainerTest {
     @DisplayName("validateAccessToken 메서드는 유효하지 않은 accessToken이 주어지면, 예외를 던진다.")
     @Test
     void validateAccessToken_exception() {
-        Assertions.assertThrows(ExceptionWithMessageAndCode.INVALID_JWT_TOKEN.getException().getClass(),
+        Assertions.assertThrows(ExceptionWithMessageAndCode.INVALID_ACCESS_TOKEN.getException().getClass(),
             () -> jwtTokenProvider.validateAccessToken("invalidAccessToken"));
     }
 
@@ -102,7 +102,7 @@ class JwtTokenProviderTest extends SpringContainerTest {
     @DisplayName("validateRefreshToken 메서드는 유효하지 않은 refreshToken이 주어지면, 예외를 던진다.")
     @Test
     void validateRefreshToken_exception() {
-        Assertions.assertThrows(ExceptionWithMessageAndCode.INVALID_JWT_TOKEN.getException().getClass(),
+        Assertions.assertThrows(ExceptionWithMessageAndCode.INVALID_REFRESH_TOKEN.getException().getClass(),
             () -> jwtTokenProvider.validateRefreshToken("invalidRefreshToken"));
     }
 
@@ -118,7 +118,7 @@ class JwtTokenProviderTest extends SpringContainerTest {
     @DisplayName("getAccessTokenPayload 메서드는 유효하지 않은 accessToken이 주어지면, 예외를 던진다.")
     @Test
     void getAccessTokenPayload_exception() {
-        Assertions.assertThrows(ExceptionWithMessageAndCode.INVALID_JWT_TOKEN.getException().getClass(),
+        Assertions.assertThrows(ExceptionWithMessageAndCode.INVALID_ACCESS_TOKEN.getException().getClass(),
             () -> jwtTokenProvider.getAccessTokenPayload("IncorrectToken"));
     }
 

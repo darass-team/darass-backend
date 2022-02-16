@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(controllers = CommentController.class)
@@ -61,6 +62,21 @@ public class CommentControllerTest {
 
     @MockBean
     private SlackMessageSender slackMessageSender;
+
+    @DisplayName("비로그인 유저의 액세스 토큰이 undefined일 때 댓글을 조회한다.")
+    @Test
+    void readComment_guest_user_undefined_token() throws Exception {
+        given(commentService.findAllCommentsByUrlAndProjectKey(any(), any()))
+            .willReturn(null);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/v1/comments")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer undefined")
+            .param("sortOption", "LATEST")
+            .param("url", "url")
+            .param("projectKey", "secret-key"))
+            .andExpect(status().isOk());
+    }
 
     @DisplayName("비로그인 유저가 비밀 댓글을 조회한다.")
     @Test

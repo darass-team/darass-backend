@@ -517,8 +517,8 @@ class UserAcceptanceTest extends SpringContainerTest { //TODO: 로그아웃 기�
         String jsonResponse = resultActions.andReturn().getResponse().getContentAsString();
         ExceptionResponse exceptionResponse = new ObjectMapper().readValue(jsonResponse, ExceptionResponse.class);
 
-        assertThat(exceptionResponse.getMessage()).isEqualTo(ExceptionWithMessageAndCode.INVALID_JWT_TOKEN.findMessage());
-        assertThat(exceptionResponse.getCode()).isEqualTo(ExceptionWithMessageAndCode.INVALID_JWT_TOKEN.findCode());
+        assertThat(exceptionResponse.getMessage()).isEqualTo(ExceptionWithMessageAndCode.INVALID_ACCESS_TOKEN.findMessage());
+        assertThat(exceptionResponse.getCode()).isEqualTo(ExceptionWithMessageAndCode.INVALID_ACCESS_TOKEN.findCode());
     }
 
 

@@ -5,6 +5,7 @@ import com.darass.auth.infrastructure.AuthorizationExtractor;
 import com.darass.auth.service.OAuthService;
 import com.darass.user.domain.GuestUser;
 import com.darass.user.domain.User;
+import java.util.Locale;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class AuthenticationPrincipalArgumentResolver implements HandlerMethodArg
         String accessToken = AuthorizationExtractor
             .extract(Objects.requireNonNull(webRequest.getNativeRequest(HttpServletRequest.class)));
 
-        if (Objects.isNull(accessToken) || accessToken.isEmpty()) {
+        if (Objects.isNull(accessToken) || accessToken.isEmpty() || accessToken.equalsIgnoreCase("UNDEFINED")) {
             return new GuestUser();
         }
 

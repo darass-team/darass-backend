@@ -378,6 +378,7 @@ class CommentAcceptanceTest extends MockSpringContainerTest {
 
         mockMvc.perform(get("/api/v1/comments")
             .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer undefined")
             .param("sortOption", "LATEST")
             .param("url", "url")
             .param("projectKey", secretKey))
