@@ -129,18 +129,6 @@ class OAuthServiceTest extends MockSpringContainerTest {
         assertThat(tokenResponse.getAccessToken()).isNotEqualTo(accessTokenResponse.getAccessToken());
     }
 
-    @DisplayName("유효한 refreshToken이 주어지고, DB의 accessToken이 유효하다면 예외를 던진다.")
-    @Test
-    void getAccessTokenWithRefreshToken_alreay_validated_access_token() throws InterruptedException {
-        TokenRequest tokenRequest = new TokenRequest(KaKaoOAuthProvider.NAME, AUTHORIZATION_CODE);
-        TokenResponse tokenResponse = oAuthService.oauthLogin(tokenRequest);
-
-        Thread.sleep(1000);
-
-        assertThatThrownBy(() -> oAuthService.getAccessTokenWithRefreshToken(tokenResponse.getRefreshToken()))
-            .isInstanceOf(ExceptionWithMessageAndCode.ALREADY_VALIDATED_ACCESS_TOKEN.getException().getClass());
-    }
-
     @DisplayName("refreshAccessTokenWithRefreshToken 메서드는 refreshToken이 db에 존재하지 않는다면, 예외를 던진다.")
     @Test
     void refreshAccessTokenWithRefreshToken_exception() {

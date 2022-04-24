@@ -142,30 +142,6 @@ class AuthAcceptanceTest extends MockSpringContainerTest {
         리프레시_토큰_요청_객체가_존재_하지않아_엑세스_토큰_재발급_실패됨(tokenRefreshResultActions);
     }
 
-    @DisplayName("유효한 refreshToken이 주어지고, DB의 accessToken이 유효하다면 예외를 던진다.")
-    @Test
-    void getAccessTokenWithRefreshToken_alreay_validated_access_token() throws Exception {
-        //given
-        given(oAuthProviderFactory.getOAuthProvider(any())).willReturn(kaKaoOAuthProvider);
-        given(kaKaoOAuthProvider.requestSocialLoginUser(any())).willReturn(socialLoginUser);
-
-        ResultActions tokenRequestResultActions = 토큰_발급_요청(KaKaoOAuthProvider.NAME, authorizationCode);
-        토큰_발급됨(tokenRequestResultActions);
-
-        String jsonResponse = tokenRequestResultActions.andReturn().getResponse().getContentAsString();
-
-        TokenResponse tokenResponse = new ObjectMapper().readValue(jsonResponse, TokenResponse.class);
-        String refreshToken = tokenResponse.getRefreshToken();
-
-        // when
-        Thread.sleep(1000);
-
-        ResultActions tokenRefreshResultActions = 토큰_리프레시_요청(new RefreshTokenRequest(refreshToken));
-
-        이미_유효한_액세스_토큰으로_인해_액세스_토큰_재발급_실패됨(tokenRefreshResultActions);
-    }
-
-
     @DisplayName("유효하지 않는 refresh 토큰이라면, accessToken을 재발급을 실패한다.")
     @Test
     void refreshToken_invalid_refresh_token_fail() throws Exception {
