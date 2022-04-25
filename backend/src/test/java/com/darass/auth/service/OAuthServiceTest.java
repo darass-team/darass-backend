@@ -15,6 +15,7 @@ import com.darass.exception.ExceptionWithMessageAndCode;
 import com.darass.user.domain.SocialLoginUser;
 import java.util.Optional;
 import javax.persistence.EntityManager;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -108,6 +109,17 @@ class OAuthServiceTest extends MockSpringContainerTest {
         assertThat(result.getProfileImageUrl()).isEqualTo(socialLoginUser.getProfileImageUrl());
         assertThat(result.getOauthProvider()).isEqualTo(socialLoginUser.getOauthProvider());
         assertThat(result.getEmail()).isEqualTo(socialLoginUser.getEmail());
+    }
+
+    @DisplayName("findSocialLoginUserByAccessToken 메서드는 accessToken이 db에 존재하지 않는다면, 예외를 던진다.")
+    @Test
+    void findSocialLoginUserByAccessToken_exception() {
+        TokenRequest tokenRequest = new TokenRequest(KaKaoOAuthProvider.NAME, AUTHORIZATION_CODE);
+        TokenResponse tokenResponse = oAuthService.oauthLogin(tokenRequest);
+        socialLoginUserRepository.deleteAll();
+
+        assertThatThrownBy(() -> oAuthService.findSocialLoginUserByAccessToken(tokenResponse.getAccessToken()))
+                .isInstanceOf(ExceptionWithMessageAndCode.INVALID_JWT_NOT_FOUND_USER_TOKEN.getException().getClass());
     }
 
     @DisplayName("유효한 refreshToken이 주어지고, DB의 accessToken이 유효하지 않다면 accessToken을 발급해준다.")

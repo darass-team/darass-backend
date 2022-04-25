@@ -83,4 +83,12 @@ public class SocialLoginUser extends User {
         this.email = email;
     }
 
+    public boolean isSameAccessToken(String accessToken) {
+        return Objects.equals(accessToken, this.accessToken);
+    }
+
+    public boolean isSameRefreshToken(String refreshToken) {
+        return Objects.equals(refreshToken, this.refreshToken);
+    }
+
 }

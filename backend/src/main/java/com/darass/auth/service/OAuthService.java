@@ -44,21 +44,31 @@ public class OAuthService {
         jwtTokenProvider.validateAccessToken(accessToken);
         String userId = jwtTokenProvider.getAccessTokenPayload(accessToken);
 
-        return socialLoginUserRepository.findById(Long.parseLong(userId))
-            .orElseThrow(ExceptionWithMessageAndCode.INVALID_JWT_NOT_FOUND_USER_TOKEN::getException);
+        Optional<SocialLoginUser> socialLoginUserAble = socialLoginUserRepository.findById(Long.parseLong(userId));
+        if (socialLoginUserAble.isPresent()) {
+            SocialLoginUser socialLoginUser = socialLoginUserAble.get();
+
+            if (socialLoginUser.isSameAccessToken(accessToken)) {
+                return socialLoginUser;
+            }
+        }
+        throw ExceptionWithMessageAndCode.INVALID_JWT_NOT_FOUND_USER_TOKEN.getException();
     }
 
     public AccessTokenResponse getAccessTokenWithRefreshToken(String refreshToken) {
         jwtTokenProvider.validateRefreshToken(refreshToken);
 
-        SocialLoginUser socialLoginUser = socialLoginUserRepository.findByRefreshToken(refreshToken)
-            .orElseThrow(() -> {
-                throw ExceptionWithMessageAndCode.NOT_EXISTS_REFRESH_TOKEN.getException();
-            });
+        Optional<SocialLoginUser> socialLoginUserAble = socialLoginUserRepository.findByRefreshToken(refreshToken);
+        if (socialLoginUserAble.isPresent()) {
+            SocialLoginUser socialLoginUser = socialLoginUserAble.get();
 
-        String accessToken = jwtTokenProvider.createAccessToken(socialLoginUser);
-        socialLoginUser.updateAccessToken(accessToken);
-        return new AccessTokenResponse(accessToken);
+            if (socialLoginUser.isSameRefreshToken(refreshToken)) {
+                String accessToken = jwtTokenProvider.createAccessToken(socialLoginUser);
+                socialLoginUser.updateAccessToken(accessToken);
+                return new AccessTokenResponse(accessToken);
+            }
+        }
+        throw ExceptionWithMessageAndCode.INVALID_JWT_NOT_FOUND_USER_TOKEN.getException();
     }
 
     public void logOut(SocialLoginUser socialLoginUser) {

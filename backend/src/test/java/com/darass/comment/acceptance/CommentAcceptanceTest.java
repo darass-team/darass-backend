@@ -49,7 +49,7 @@ import org.springframework.test.web.servlet.ResultActions;
 class CommentAcceptanceTest extends MockSpringContainerTest {
 
     @Autowired
-    JwtTokenProvider jwtTokenProvider;
+    private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     private UserRepository users;
@@ -102,7 +102,10 @@ class CommentAcceptanceTest extends MockSpringContainerTest {
         users.save(socialLoginUser);
 
         adminToken = jwtTokenProvider.createAccessToken(admin);
+        users.save(admin);
+
         token = jwtTokenProvider.createAccessToken(socialLoginUser);
+        users.save(socialLoginUser);
     }
 
     @BeforeEach

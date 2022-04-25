@@ -35,7 +35,7 @@ public class RequiredLoginArgumentResolver implements HandlerMethodArgumentResol
         String accessToken = AuthorizationExtractor
             .extract(Objects.requireNonNull(webRequest.getNativeRequest(HttpServletRequest.class)));
 
-        if (Objects.isNull(accessToken) || accessToken.isEmpty()) {
+        if (Objects.isNull(accessToken) || accessToken.isEmpty() || accessToken.equalsIgnoreCase("UNDEFINED")) {
             throw ExceptionWithMessageAndCode.NOT_EXISTS_ACCESS_TOKEN.getException();
         }
         return accessToken;

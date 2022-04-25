@@ -52,6 +52,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityManager;
+
 //TODO: user 필드에 추가된 빨간점 알람. flyway 반영
 
 @DisplayName("User 인수테스트")
@@ -69,6 +71,9 @@ class UserAcceptanceTest extends SpringContainerTest { //TODO: 로그아웃 기�
 
     @Autowired
     private JwtTokenProvider tokenProvider;
+
+    @Autowired
+    private EntityManager entityManager;
 
     private SocialLoginUser socialLoginUser;
 
@@ -101,6 +106,7 @@ class UserAcceptanceTest extends SpringContainerTest { //TODO: 로그아웃 기�
     void findUser_success() throws Exception {
         //given
         String accessToken = tokenProvider.createAccessToken(socialLoginUser);
+        userRepository.save(socialLoginUser);
 
         //when
         ResultActions resultActions = 유저_조회_요청(accessToken, REFRESH_TOKEN);
@@ -138,6 +144,8 @@ class UserAcceptanceTest extends SpringContainerTest { //TODO: 로그아웃 기�
     void updateUserNickname_success() throws Exception {
         //given
         String accessToken = tokenProvider.createAccessToken(socialLoginUser);
+        userRepository.save(socialLoginUser);
+
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest("병욱", null, true);
 
         //when
@@ -152,6 +160,8 @@ class UserAcceptanceTest extends SpringContainerTest { //TODO: 로그아웃 기�
     void updateProfileImage_success() throws Exception {
         //given
         String accessToken = tokenProvider.createAccessToken(socialLoginUser);
+        userRepository.save(socialLoginUser);
+
         byte[] bytes = Files.readAllBytes(Paths.get("./src/test/resources/static/testImg.jpg"));
         String originalFilename = "testImg.jpg";
         MultipartFile multipartFile = new MockMultipartFile("profileImageFile", originalFilename, "image/jpeg", bytes);
@@ -170,6 +180,8 @@ class UserAcceptanceTest extends SpringContainerTest { //TODO: 로그아웃 기�
     void updateUserNickname_length_fail() throws Exception {
         //given
         String accessToken = tokenProvider.createAccessToken(socialLoginUser);
+        userRepository.save(socialLoginUser);
+
         String invalidNickName = "invalid_nickName_invalid_nickName_invalid_nickName_invalid_nickName";
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest(invalidNickName, null, true);
 
@@ -199,6 +211,8 @@ class UserAcceptanceTest extends SpringContainerTest { //TODO: 로그아웃 기�
     public void updateProfileImage_fail() throws Exception {
         //given
         String accessToken = tokenProvider.createAccessToken(socialLoginUser);
+        userRepository.save(socialLoginUser);
+
         byte[] bytes = Files.readAllBytes(Paths.get("./src/test/resources/static/overSizeImage.jpg"));
         String originalFilename = "overSizeImage.jpg";
         MultipartFile multipartFile = new MockMultipartFile("profileImageFile", originalFilename, "image/jpeg", bytes);
@@ -218,6 +232,7 @@ class UserAcceptanceTest extends SpringContainerTest { //TODO: 로그아웃 기�
     void deleteUser_success() throws Exception {
         //given
         String accessToken = tokenProvider.createAccessToken(socialLoginUser);
+        userRepository.save(socialLoginUser);
 
         //when
         ResultActions resultActions = 유저_삭제_요청(accessToken);

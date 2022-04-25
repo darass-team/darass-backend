@@ -34,7 +34,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 @DisplayName("Project 인수 테스트")
 class ProjectAcceptanceTest extends SpringContainerTest {
 
@@ -272,6 +274,7 @@ class ProjectAcceptanceTest extends SpringContainerTest {
     public void deleteById_success() throws Exception {
         // given
         String accessToken = tokenProvider.createAccessToken(socialLoginUser);
+
         Project project = projectRepository.save(makeProject(JEKYLL_PROJECT_NAME, JEKYLL_PROJECT_DESCRIPTION));
 
         //when
